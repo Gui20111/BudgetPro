@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{  --green:#1A9E72;
+  --green-light:#22C58B;
+  --black:#0A0E0C;
+  --white:#FAFCFB;
+  --gray:#8A9490;
+  --card-bg:#111815;
+  --border:rgba(255,255,255,0.07);
+}
+html,body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(26,158,114,.2) 0%,transparent 70%);top:-150px;left:-100px;animation:f1 8s ease-in-out infinite}
+.glow-2{width:400px;height:400px;background:radial-gradient(circle,rgba(34,197,139,.13) 0%,transparent 70%);bottom:0;right:-80px;animation:f2 10s ease-in-out infinite}
+@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,40px)}}
+@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
+
+.page{position:relative;z-index:1}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,14,12,.85);backdrop-filter:blur(16px);z-index:99}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo-icon{width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-logo-name{font-family:Arial, Helvetica, sans-serif, 'Arial Narrow', Arial, sans-serif;font-size:16px;font-weight:700}
+.nav-logo-name span{color:var(--green-light)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:13px;color:var(--gray);text-decoration:none;transition:.2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:500;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;transition:.2s;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif}
+.nav-cta:hover{background:var(--green-light);transform:translateY(-1px)}
+
+/* HERO */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:5rem 2rem 3rem;max-width:780px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(26,158,114,.1);border:1px solid rgba(26,158,114,.25);color:var(--green-light);font-size:11.5px;font-weight:500;padding:6px 14px;border-radius:20px;margin-bottom:1.8rem;letter-spacing:.04em;animation:up .6s ease both}
+.dot{width:6px;height:6px;background:var(--green-light);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+h1{font-family:Arial, Helvetica, sans-serif;font-size:clamp(2.6rem,5.5vw,4.2rem);font-weight:800;line-height:1.07;letter-spacing:-.025em;margin-bottom:1.4rem;animation:up .6s .1s ease both}
+.green{color:var(--green-light)}
+.muted{display:block;color:rgba(255,255,255,.22);font-size:clamp(1.2rem,2.5vw,1.7rem);font-weight:300;font-family:'Inter',sans-serif;font-style:italic;margin-top:.4rem}
+
+.sub{font-size:.95rem;color:var(--gray);line-height:1.75;max-width:490px;margin-bottom:2.2rem;font-weight:300;animation:up .6s .2s ease both}
+
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:up .6s .3s ease both}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;padding:12px 26px;border-radius:9px;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.25s}
+.btn-p{background:var(--green);color:#f7f7f7}
+.btn-p:hover{background:var(--green-light);transform:translateY(-2px);box-shadow:0 10px 35px rgba(26,158,114,.35)}
+.btn-s{background:rgba(255,255,255,.05);color:var(--white);border:1px solid var(--border)}
+.btn-s:hover{background:rgba(255,255,255,.09);transform:translateY(-2px)}
+
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* MOCKUP */
+.mock-wrap{width:100%;max-width:660px;margin:3rem auto 0;animation:up .7s .4s ease both;position:relative}
+.mock-glow{position:absolute;inset:-2px;background:linear-gradient(135deg,rgba(26,158,114,.35),transparent 55%);border-radius:16px;filter:blur(22px);z-index:-1}
+.mock{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.7)}
+.mock-bar{display:flex;align-items:center;padding:.65rem 1rem;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);gap:6px}
+.d{width:9px;height:9px;border-radius:50%}
+.d1{background:#FF5F57}.d2{background:#FEBC2E}.d3{background:#28C840}
+.url{flex:1;background:rgba(255,255,255,.04);border-radius:4px;padding:3px 10px;font-size:10px;color:var(--gray);text-align:center;margin:0 10px}
+.mock-grid{display:grid;grid-template-columns:1fr 1fr}
+.mg-l{padding:1rem;border-right:1px solid var(--border)}
+.mg-r{padding:1rem;background:rgba(255,255,255,.015)}
+.ml{font-size:9px;font-weight:600;letter-spacing:.1em;color:rgba(255,255,255,.2);text-transform:uppercase;margin-bottom:.6rem}
+.mf{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:5px;padding:6px 9px;margin-bottom:6px;font-size:11px;color:rgba(255,255,255,.35)}
+.mf.ok{color:rgba(255,255,255,.65);border-color:rgba(26,158,114,.25)}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.mbtn{width:100%;background:var(--green);border:none;border-radius:5px;padding:7px;font-size:10.5px;color:#fff;font-weight:500;margin-top:3px;cursor:pointer}
+.mcard{background:rgba(26,158,114,.1);border:1px solid rgba(26,158,114,.22);border-radius:8px;padding:.75rem}
+.mcard-title{font-family:'Syne',sans-serif;font-size:12.5px;font-weight:700;color:#fff;margin-bottom:.5rem;letter-spacing:.04em}
+.mcard-row{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.35);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mcard-row:last-child{border:none}
+.mcard-row span:last-child{color:rgba(255,255,255,.6)}
+.mtotal{display:flex;justify-content:space-between;align-items:center;background:var(--green);border-radius:5px;padding:6px 9px;margin-top:7px}
+.mtotal span:first-child{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em}
+.mtotal span:last-child{font-size:13px;font-weight:700;color:#fff;font-family:'Syne',sans-serif}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:3.5rem;padding:2.5rem 2rem;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:4rem}
+.stat-v{font-family:Arial, Helvetica, sans-serif;font-size:2.1rem;font-weight:800;color:var(--white)}
+.stat-v span{color:var(--green-light)}
+.stat-l{font-size:12px;color:var(--gray);margin-top:2px}
+
+/* FEATURES */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.feat{background:var(--black);padding:1.8rem;transition:.3s}
+.feat:hover{background:rgba(26,158,114,.04)}
+.fi{width:36px;height:36px;background:rgba(26,158,114,.1);border:1px solid rgba(26,158,114,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:.9rem;font-size:15px}
+.ft{font-family:Arial, Helvetica, sans-serif;font-size:14px;font-weight:700;margin-bottom:.4rem}
+.fd{font-size:12.5px;color:var(--gray);line-height:1.6}
+
+/* CTA FINAL */
+.cta{text-align:center;padding:5rem 2rem}
+.cta h2{font-family:Arial, Helvetica, sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:.9rem}
+.cta p{color:var(--gray);font-size:13.5px;margin-bottom:2rem}
+.btn-big{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;font-size:15px;font-weight:500;padding:15px 34px;border-radius:11px;border:none;cursor:pointer;transition:.25s;font-family:'Inter',sans-serif}
+.btn-big:hover{background:var(--green-light);transform:translateY(-3px);box-shadow:0 16px 45px rgba(26,158,114,.38)}
+.btn-big svg{transition:.25s}
+.btn-big:hover svg{transform:translateX(4px)}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center}
+footer p{font-size:12px;color:rgba(255,255,255,.18)}
+</style>
+</head>
+<body>
+<div class="page">
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><rect x="2" y="2" width="13" height="13" rx="3" stroke="#fff" stroke-width="1.5"/><path d="M5.5 8.5h6M5.5 11h4M5.5 6h4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <span class="nav-logo-name">Budget<span>Pro</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Funcionalidades</a>
+      <a href="#">Exemplos</a>
+    </div>
+<button
+ class="nav-cta" onclick="entrar()">Criar meu orçamento agora!</button>
+
+<script>
+function entrar(){
+  window.location.href = "login.html";
+}
+</script>
+  </nav>
+
+
+  <div class="hero">
+    <div class="badge"><div class="dot"></div>FEITO PARA NEGÓCIOS DE ALTO PADRÃO</div>
+    <h1>
+      Orçamentos que<br/>
+      <span class="green">fecham clientes.</span>
+      <span class="muted">não afastam.</span>
+    </h1>
+    <p class="sub">Chega de orçamento no WhatsApp todo bagunçado. Gere propostas profissionais em segundos e passe mais confiança pro seu cliente.</p>
+    <div class="nav-cta">
+  <button onclick="entrar()">Começar Agora!</button>
+<svg width="18" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7.5 3l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<script>
+function entrar(){
+  window.location.href = "login.html";
+}
+</script>
+      
+    </div>
+
+    <div class="mock-wrap">
+      <div class="mock-glow"></div>
+      <div class="mock">
+        <div class="mock-bar">
+          <div class="d d1"></div><div class="d d2"></div><div class="d d3"></div>
+          <div class="url">budgetpro.com.br/novo</div>
+        </div>
+        <div class="mock-grid">
+          <div class="mg-l">
+            <div class="ml">Dados do cliente</div>
+            <div class="mf ok">Guilherme Godoy </div>
+            <div class="mf ok">Criação de logo profissional</div>
+            <div class="mf" style="font-size:10px;color:rgba(255,255,255,.2)">Descreva o serviço...</div>
+            <div class="mrow">
+              <div class="mf ok">R$ 350,00</div>
+              <div class="mf ok">3 dias úteis</div>
+            </div>
+            <button class="mbtn">Gerar orçamento →</button>
+          </div>
+          <div class="mg-r">
+            <div class="ml">Preview</div>
+            <div class="mcard">
+              <div class="mcard-title">ORÇAMENTO</div>
+              <div class="mcard-row"><span>Cliente</span><span>João Silva</span></div>
+              <div class="mcard-row"><span>Serviço</span><span>Criação de logo</span></div>
+              <div class="mcard-row"><span>Prazo</span><span>3 dias úteis</span></div>
+              <div class="mcard-row"><span>Pagamento</span><span>50% entrada</span></div>
+              <div class="mtotal"><span>Total</span><span>R$ 350,00</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div><div class="stat-v">30<span>S</span></div><div class="stat-l">para gerar um orçamento</div></div>
+    <div><div class="stat-v"><span>+</span>2K</div><div class="stat-l">orçamentos gerados</div></div>
+    <div><div class="stat-v"><span>R$</span>0</div><div class="stat-l">para começar hoje</div></div>
+  </div>
+
+  <div class="feats">
+    <div class="feat"><div class="fi">⚡</div><div class="ft">Rápido de verdade</div><div class="fd">Preencha, clique e pronto. Orçamento gerado em menos de 1 minuto.</div></div>
+    <div class="feat"><div class="fi">💼</div><div class="ft">Visual profissional</div><div class="fd">Layouts limpos que passam credibilidade. Seu cliente percebe na hora.</div></div>
+    <div class="feat"><div class="fi">📋</div><div class="ft">Histórico completo</div><div class="fd">Acompanhe todos os orçamentos — aprovados, recusados ou pendentes.</div></div>
+    <div class="feat"><div class="fi">📱</div><div class="ft">Copie pro WhatsApp</div><div class="fd">Formatado e organizado para impressionar o cliente na conversa.</div></div>
+    <div class="feat"><div class="fi">📄</div><div class="ft">Baixe em PDF</div><div class="fd">Gere arquivos PDF prontos para enviar por e-mail. Plano Pro.</div></div>
+    <div class="feat"><div class="fi">📊</div><div class="ft">Dashboard de vendas</div><div class="fd">Acompanhe total faturado, aprovações e evolução do negócio.</div></div>
+  </div>
+
+  <div class="cta">
+    <h2>Pronto para fechar<br/>mais clientes?</h2>
+    <p>Comece grátis agora. Sem cadastro, sem cartão de crédito.</p>
+   <a href="login.html">
+  <button class="nav-cta">
+    Criar meu primeiro orçamento 
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+   </a>
+  </div>
+
+  <footer>
+    <p>© 2025 BudgetPro. Todos os direitos reservados.</p>
+    <p>Feito para quem trabalha de verdade 💚</p>
+  </footer>
+</div>
+
+<script>
+function irApp(){
+  sendPrompt('Abrir o app de orçamentos do BudgetPro');
+}
+</script>
+</body>
+</html>

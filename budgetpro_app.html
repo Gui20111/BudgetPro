@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>BudgetPro</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{  --green:#24c76d;
+  --green-light:#2cd372;
+  --black:#0f1b15;
+  --white:#ffffff;
+  --gray:#707070;
+  --card-bg:#148657;
+  --border:rgba(255,255,255,0.07);
+}
+html,body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(13, 201, 138, 0.705) 0%,transparent 70%);top:-150px;left:-100px;animation:f1 8s ease-in-out infinite}
+.glow-2{width:400px;height:400px;background:radial-gradient(circle,rgba(34, 197, 140, 0.623) 0%,transparent 70%);bottom:0;right:-80px;animation:f2 10s ease-in-out infinite}
+@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,40px)}}
+@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
+
+
+/* CONTAINER */
+.wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+  max-width:1000px;
+  margin:auto;
+}
+
+/* PAINEL (glass effect) */
+.panel{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(37, 196, 132, 0.815);
+  border-radius:16px;
+  padding:20px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 0 40px rgba(0,255,150,0.08);
+}
+
+/* TITULO */
+.panel-title{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#aaa;
+  margin-bottom:15px;
+}
+
+/* CAMPOS */
+.field{
+  margin-bottom:12px;
+}
+
+.field input,
+.field textarea{
+  width:100%;
+  padding:12px;
+  margin-top:5px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;
+  color:#fff;
+  outline:none;
+  transition:0.2s;
+}
+
+.field input:focus,
+.field textarea:focus{
+  border:1px solid #00ff95;
+  box-shadow:0 0 0 2px rgba(0,255,150,0.2);
+}
+
+::placeholder{
+  color:rgba(255,255,255,0.4);
+}
+
+/* GRID */
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+/* BOTÃO */
+.btn-gen{
+  width:100%;
+  padding:14px;
+  background:#00a86b;
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
+  transition:0.2s;
+}
+
+.btn-gen:hover{
+  background:#00c27a;
+}
+
+/* PREVIEW */
+.orcamento{
+  display:none;
+}
+
+.orcamento.show{
+  display:block;
+}
+
+/* HEADER DO CARD */
+.orc-header{
+  background:rgba(0,255,150,0.1);
+  padding:15px;
+  border-radius:12px 12px 0 0;
+}
+
+/* CORPO */
+.orc-body{
+  background:rgba(255,255,255,0.02);
+  padding:15px;
+  border:1px solid rgba(37, 196, 132, 0.815);
+  border-radius:0 0 12px 12px;
+  border:1px solid rgba(46, 235, 156, 0.993);
+}
+
+/* LINHAS */
+.orc-row{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+/* TOTAL */
+.orc-total{
+  margin-top:10px;
+  padding:12px;
+  background:#124231;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+}
+.budget{
+  color: white;
+}
+
+.pro{
+  color: #117354;
+}
+
+/* BOTÕES */
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.btn-act{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+  transition:0.2s;
+}
+
+.btn-act:hover{
+  background:rgba(255,255,255,0.15);
+}
+.txtb{
+  color: #fff;
+}
+
+.txtp{
+color: #00a86b;
+}
+
+/* TEXTO COPIADO */
+.copy-ok{
+  margin-top:5px;
+  font-size:12px;
+  color:#00ff95;
+  display:none;
+}
+
+/* RESPONSIVO */
+@media(max-width:700px){
+  .wrap{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<h2>
+  <span class="budget">Budget</span><span class="pro">Pro</span>
+</h2>
+<div class="wrap">
+
+<div class="panel">
+<p class="panel-title">Dados do orçamento</p>
+
+<div class="field">
+<input id="empresa" placeholder="Empresa">
+</div>
+
+<div class="field">
+<input id="cliente" placeholder="Cliente">
+</div>
+
+<div class="field">
+<input id="servico" placeholder="Serviço">
+</div>
+
+<div class="field">
+<textarea id="desc" placeholder="Descrição"></textarea>
+</div>
+
+<div class="field">
+<input id="valor" placeholder="Valor">
+<input id="prazo" placeholder="Prazo">
+</div>
+
+<button class="btn-gen" onclick="gerar()">Gerar orçamento</button>
+</div>
+
+
+<div>
+<div id="orc" class="orcamento">
+
+<div class="orc-header">
+<h3>ORÇAMENTO</h3>
+<p id="orc-empresa"></p>
+</div>
+
+<div class="orc-body">
+
+<div class="orc-row">
+<span>Cliente</span>
+<span id="orc-cliente"></span>
+</div>
+
+<div class="orc-row">
+<span>Serviço</span>
+<span id="orc-servico"></span>
+</div>
+
+<div class="orc-row">
+<span>Descrição</span>
+<span id="orc-desc"></span>
+</div>
+
+<div class="orc-row">
+<span>Prazo</span>
+<span id="orc-prazo"></span>
+</div>
+
+<div class="orc-total">
+<span>Total</span>
+<span id="orc-valor"></span>
+</div>
+
+<div class="actions">
+<button class="btn-act" onclick="copiar()">📋 Copiar</button>
+<button class="btn-act" onclick="gerarPDF()">📄 PDF</button>
+</div>
+
+<div id="copiado" class="copy-ok">Copiado!</div>
+
+</div>
+</div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+
+function gerar(){
+  document.getElementById('orc').classList.add('show');
+
+  document.getElementById('orc-empresa').innerText = empresa.value;
+  document.getElementById('orc-cliente').innerText = cliente.value;
+  document.getElementById('orc-servico').innerText = servico.value;
+  document.getElementById('orc-desc').innerText = desc.value;
+  document.getElementById('orc-prazo').innerText = prazo.value;
+  document.getElementById('orc-valor').innerText = "R$ " + valor.value;
+}
+
+function copiar(){
+  const texto = `
+ORÇAMENTO
+
+Empresa: ${document.getElementById('orc-empresa').innerText}
+Cliente: ${document.getElementById('orc-cliente').innerText}
+Serviço: ${document.getElementById('orc-servico').innerText}
+Descrição: ${document.getElementById('orc-desc').innerText}
+Prazo: ${document.getElementById('orc-prazo').innerText}
+
+Valor total: ${document.getElementById('orc-valor').innerText}
+`;
+
+  const textarea = document.createElement("textarea");
+  textarea.value = texto;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+
+  const aviso = document.getElementById('copiado');
+  aviso.style.display = "block";
+
+  setTimeout(()=> aviso.style.display = "none", 2000);
+}
+
+function gerarPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("ORÇAMENTO", 20, 20);
+  doc.text("Empresa: " + document.getElementById('orc-empresa').innerText, 20, 40);
+  doc.text("Cliente: " + document.getElementById('orc-cliente').innerText, 20, 50);
+  doc.text("Serviço: " + document.getElementById('orc-servico').innerText, 20, 60);
+  doc.text("Descrição: " + document.getElementById('orc-desc').innerText, 20, 70);
+  doc.text("Prazo: " + document.getElementById('orc-prazo').innerText, 20, 80);
+  doc.text("Valor total: " + document.getElementById('orc-valor').innerText, 20, 100);
+
+  doc.save("orcamento.pdf");
+}
+
+</script>
+
+</body>
+</html>
+

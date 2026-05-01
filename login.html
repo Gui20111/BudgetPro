@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - BudgetPro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-deep: #0d2b1f;
+    --green-mid: #1a4a32;
+    --green-accent: #2dbe7a;
+    --green-light: #a8f0c8;
+    --cream: #f7f3ec;
+    --cream-dark: #ede8df;
+    --text-main: #0d2b1f;
+    --text-muted: #6b8f7a;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    overflow: hidden;
+  }
+
+  /* Left panel */
+  .panel-left {
+    width: 45%;
+    background: var(--green-deep);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+    overflow: hidden;
+  }
+
+  .panel-left::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,190,122,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .panel-left::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,190,122,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeSlideDown 0.6s ease both;
+  }
+
+  .brand-icon {
+    width: 40px; height: 40px;
+    background: var(--green-accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .brand-icon svg { width: 22px; height: 22px; }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+
+  .brand-name span { color: var(--green-accent); }
+
+  .panel-copy {
+    animation: fadeSlideUp 0.7s 0.2s ease both;
+  }
+
+  .panel-copy h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.03em;
+  }
+
+  .panel-copy h1 em {
+    font-style: italic;
+    color: var(--green-accent);
+  }
+
+  .panel-copy p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 280px;
+    font-weight: 300;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 2rem;
+    animation: fadeSlideUp 0.7s 0.4s ease both;
+  }
+
+  .stat { display: flex; flex-direction: column; gap: 0.25rem; }
+
+  .stat-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--green-accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  /* Floating card decoration */
+  .deco-card {
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(45,190,122,0.15);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    animation: fadeIn 0.8s 0.5s ease both;
+  }
+
+  .deco-card-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: rgba(247,243,236,0.6);
+  }
+
+  .deco-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green-accent);
+    flex-shrink: 0;
+  }
+
+  .deco-dot.yellow { background: #f5c842; }
+  .deco-dot.red { background: #f05a5a; }
+
+  /* Right panel */
+  .panel-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    position: relative;
+  }
+
+  /* Subtle grid texture */
+  .panel-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(13,43,31,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,43,31,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .form-card {
+    width: 100%;
+    max-width: 380px;
+    animation: fadeSlideUp 0.6s 0.1s ease both;
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--text-main);
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-header p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap svg {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    background: white;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input:focus {
+    border-color: var(--green-accent);
+    box-shadow: 0 0 0 3px rgba(45,190,122,0.12);
+  }
+
+  input:focus + svg,
+  .input-wrap:has(input:focus) svg {
+    color: var(--green-accent);
+  }
+
+  input::placeholder { color: #b5c9bc; }
+
+  .forgot {
+    text-align: right;
+    margin-top: 0.4rem;
+  }
+
+  .forgot a {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .forgot a:hover { color: var(--green-accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.95rem;
+    background: var(--green-deep);
+    color: var(--cream);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    margin-top: 0.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary:hover {
+    background: var(--green-mid);
+    box-shadow: 0 6px 20px rgba(13,43,31,0.2);
+  }
+
+  .btn-primary:active { transform: scale(0.98); }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cream-dark);
+  }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 0.95rem;
+    background: transparent;
+    color: var(--text-main);
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--green-accent);
+    background: rgba(45,190,122,0.05);
+    box-shadow: 0 4px 12px rgba(45,190,122,0.08);
+  }
+
+  .btn-secondary:active { transform: scale(0.98); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green-deep);
+    color: var(--cream);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(13,43,31,0.25);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+    opacity: 0;
+    z-index: 999;
+    white-space: nowrap;
+    border-left: 3px solid var(--green-accent);
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .toast.error { border-left-color: #f05a5a; }
+
+  /* Animations */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @media (max-width: 700px) {
+    .panel-left { display: none; }
+    .panel-right { padding: 2rem 1.5rem; }
+    body { overflow: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Left panel -->
+<div class="panel-left">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0d2b1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <span class="brand-name">Budget<span>Pro</span></span>
+  </div>
+
+  <div class="panel-copy">
+    <h1>Controle seu<br><em>dinheiro</em><br>com clareza.</h1>
+    <p>Acompanhe despesas, metas e seu orçamento num só lugar — simples, bonito e eficiente.</p>
+  </div>
+
+  <div class="deco-card">
+    <div class="deco-card-row"><div class="deco-dot"></div>Salário recebido +R$4.200</div>
+    <div class="deco-card-row"><div class="deco-dot yellow"></div>Aluguel −R$1.100</div>
+    <div class="deco-card-row"><div class="deco-dot red"></div>Mercado −R$340</div>
+    <div class="deco-card-row"><div class="deco-dot"></div>Meta de março 78%</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-number">12k+</span>
+      <span class="stat-label">Usuários</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">R$2M</span>
+      <span class="stat-label">Gerenciados</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">4.9★</span>
+      <span class="stat-label">Avaliação</span>
+    </div>
+  </div>
+</div>
+
+<!-- Right panel -->
+<div class="panel-right">
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Bem-vindo de volta</h2>
+      <p>Entre com sua conta para continuar</p>
+    </div>
+
+    <div class="form-group">
+      <label>E-mail</label>
+      <div class="input-wrap">
+        <input id="email" type="email" placeholder="seu@email.com" autocomplete="email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Senha</label>
+      <div class="input-wrap">
+        <input id="senha" type="password" placeholder="••••••••" autocomplete="current-password">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="forgot"><a href="#">Esqueceu a senha?</a></div>
+    </div>
+
+    <button class="btn-primary" onclick="login()">Entrar</button>
+
+    <div class="divider">ou</div>
+
+    <button class="btn-secondary" onclick="cadastrar()">Criar conta grátis</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80",
+  measurementId: "G-YG55PF92J6"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+function cadastrar() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  auth.createUserWithEmailAndPassword(email, senha)
+    .then(() => showToast("✓ Conta criada com sucesso!"))
+    .catch((erro) => showToast(erro.message, 'error'));
+}
+
+function login() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  auth.signInWithEmailAndPassword(email, senha)
+    .then(() => {
+      showToast("✓ Login realizado!");
+      setTimeout(() => window.location.href = "budgetpro_app.html", 1000);
+    })
+    .catch((erro) => showToast(erro.message, 'error'));
+}
+</script>
+</body>
+</html>
