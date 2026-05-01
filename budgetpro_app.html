@@ -2,345 +2,658 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>BudgetPro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Gerador de Orçamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root{  --green:#24c76d;
-  --green-light:#2cd372;
-  --black:#0f1b15;
-  --white:#ffffff;
-  --gray:#707070;
-  --card-bg:#148657;
-  --border:rgba(255,255,255,0.07);
-}
-html,body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden}
-
-.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
-.glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(13, 201, 138, 0.705) 0%,transparent 70%);top:-150px;left:-100px;animation:f1 8s ease-in-out infinite}
-.glow-2{width:400px;height:400px;background:radial-gradient(circle,rgba(34, 197, 140, 0.623) 0%,transparent 70%);bottom:0;right:-80px;animation:f2 10s ease-in-out infinite}
-@keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,40px)}}
-@keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
-
-
-/* CONTAINER */
-.wrap{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:30px;
-  max-width:1000px;
-  margin:auto;
+:root {
+  --bg:        #080f0c;
+  --surface:   #0e1a14;
+  --surface2:  #132019;
+  --border:    rgba(45, 210, 130, 0.12);
+  --border2:   rgba(255,255,255,0.06);
+  --green:     #1fcc7a;
+  --green-dim: #17a060;
+  --green-glow:rgba(31, 204, 122, 0.15);
+  --text:      #e8f2ec;
+  --text-2:    #7a9e8a;
+  --text-3:    #3f5c4a;
+  --danger:    #f05a5a;
 }
 
-/* PAINEL (glass effect) */
-.panel{
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(37, 196, 132, 0.815);
-  border-radius:16px;
-  padding:20px;
-  backdrop-filter:blur(12px);
-  box-shadow:0 0 40px rgba(0,255,150,0.08);
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* TITULO */
-.panel-title{
-  font-size:12px;
-  text-transform:uppercase;
-  color:#aaa;
-  margin-bottom:15px;
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(130px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(31,204,122,0.12) 0%, transparent 65%);
+  top: -200px; left: -150px;
+  animation: drift1 12s ease-in-out infinite;
+}
+.orb-2 {
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(31,204,122,0.08) 0%, transparent 65%);
+  bottom: -100px; right: -100px;
+  animation: drift2 15s ease-in-out infinite;
+}
+@keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,50px)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,-40px)} }
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
 }
 
-/* CAMPOS */
-.field{
-  margin-bottom:12px;
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 2.5rem;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 2.5rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.6rem; }
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: var(--green);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.logo-mark svg { width: 18px; height: 18px; }
+
+.logo-text {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.logo-text span { color: var(--green); }
+
+.header-badge {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.35rem 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.page-title {
+  margin-bottom: 2rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.page-title h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.page-title p { font-size: 0.9rem; color: var(--text-2); font-weight: 300; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.75rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.card:nth-child(2) { animation-delay: 0.1s; }
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.03em;
 }
 
 .field input,
-.field textarea{
-  width:100%;
-  padding:12px;
-  margin-top:5px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:10px;
-  color:#fff;
-  outline:none;
-  transition:0.2s;
+.field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
 }
+
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
 
 .field input:focus,
-.field textarea:focus{
-  border:1px solid #00ff95;
-  box-shadow:0 0 0 2px rgba(0,255,150,0.2);
+.field textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-glow);
 }
 
-::placeholder{
-  color:rgba(255,255,255,0.4);
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-3); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.btn-gen {
+  width: 100%;
+  padding: 0.9rem;
+  margin-top: 0.5rem;
+  background: var(--green);
+  color: #080f0c;
+  border: none;
+  border-radius: 10px;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-/* GRID */
-.row2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+.btn-gen:hover { background: #25e589; box-shadow: 0 4px 24px rgba(31,204,122,0.3); }
+.btn-gen:active { transform: scale(0.98); }
+
+.preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  color: var(--text-3);
+  gap: 0.75rem;
+  text-align: center;
 }
 
-/* BOTÃO */
-.btn-gen{
-  width:100%;
-  padding:14px;
-  background:#00a86b;
-  border:none;
-  border-radius:10px;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-  transition:0.2s;
+.preview-empty svg { opacity: 0.3; }
+.preview-empty p { font-size: 0.85rem; font-weight: 300; line-height: 1.6; }
+
+.orcamento { display: none; }
+.orcamento.show { display: block; animation: fadeUp 0.4s ease both; }
+
+.orc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border2);
 }
 
-.btn-gen:hover{
-  background:#00c27a;
+.orc-top-left h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 0.3rem;
 }
 
-/* PREVIEW */
-.orcamento{
-  display:none;
+.orc-empresa-name {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
-.orcamento.show{
-  display:block;
+.orc-number { font-size: 0.75rem; color: var(--text-3); text-align: right; }
+.orc-number strong {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-2);
+  font-weight: 600;
 }
 
-/* HEADER DO CARD */
-.orc-header{
-  background:rgba(0,255,150,0.1);
-  padding:15px;
-  border-radius:12px 12px 0 0;
+.orc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border2);
+  gap: 1rem;
 }
 
-/* CORPO */
-.orc-body{
-  background:rgba(255,255,255,0.02);
-  padding:15px;
-  border:1px solid rgba(37, 196, 132, 0.815);
-  border-radius:0 0 12px 12px;
-  border:1px solid rgba(46, 235, 156, 0.993);
+.orc-row:last-of-type { border-bottom: none; }
+
+.orc-row-label { font-size: 0.78rem; color: var(--text-2); font-weight: 400; flex-shrink: 0; }
+.orc-row-val { font-size: 0.88rem; color: var(--text); text-align: right; word-break: break-word; max-width: 60%; }
+
+.orc-total {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(31,204,122,0.07);
+  border: 1px solid rgba(31,204,122,0.2);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* LINHAS */
-.orc-row{
-  display:flex;
-  justify-content:space-between;
-  padding:8px 0;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+.orc-total-label {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 500;
 }
 
-/* TOTAL */
-.orc-total{
-  margin-top:10px;
-  padding:12px;
-  background:#124231;
-  border-radius:10px;
-  display:flex;
-  justify-content:space-between;
-  font-weight:bold;
-}
-.budget{
-  color: white;
+.orc-total-value {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: -0.02em;
 }
 
-.pro{
-  color: #117354;
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 1rem;
 }
 
-/* BOTÕES */
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
+.btn-act {
+  padding: 0.75rem;
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  background: var(--surface2);
+  color: var(--text-2);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
-.btn-act{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  background:rgba(255,255,255,0.08);
-  color:#fff;
-  transition:0.2s;
+.btn-act:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+.btn-act:active { transform: scale(0.97); }
+
+.toast {
+  position: fixed;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0;
+  z-index: 999;
+  white-space: nowrap;
+  border-left: 3px solid var(--green);
 }
 
-.btn-act:hover{
-  background:rgba(255,255,255,0.15);
-}
-.txtb{
-  color: #fff;
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.error { border-left-color: var(--danger); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.txtp{
-color: #00a86b;
-}
-
-/* TEXTO COPIADO */
-.copy-ok{
-  margin-top:5px;
-  font-size:12px;
-  color:#00ff95;
-  display:none;
-}
-
-/* RESPONSIVO */
-@media(max-width:700px){
-  .wrap{
-    grid-template-columns:1fr;
-  }
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .page { padding: 0 1rem 3rem; }
+  header { padding: 1.5rem 0; }
+  .page-title h1 { font-size: 1.5rem; }
 }
 </style>
 </head>
-
 <body>
-<h2>
-  <span class="budget">Budget</span><span class="pro">Pro</span>
-</h2>
-<div class="wrap">
 
-<div class="panel">
-<p class="panel-title">Dados do orçamento</p>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
-<div class="field">
-<input id="empresa" placeholder="Empresa">
+<div class="page">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#080f0c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <span class="logo-text">Budget<span>Pro</span></span>
+    </div>
+    <span class="header-badge">Gerador de Orçamentos</span>
+  </header>
+
+  <div class="page-title">
+    <h1>Novo Orçamento</h1>
+    <p>Preencha os dados e visualize o orçamento em tempo real</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+      <div class="card-label">Dados do cliente</div>
+
+      <div class="field">
+        <label>Empresa</label>
+        <input id="empresa" type="text" placeholder="Nome da empresa">
+      </div>
+
+      <div class="field">
+        <label>Cliente</label>
+        <input id="cliente" type="text" placeholder="Nome do cliente">
+      </div>
+
+      <div class="field">
+        <label>Serviço</label>
+        <input id="servico" type="text" placeholder="Ex: Desenvolvimento de site">
+      </div>
+
+      <div class="field">
+        <label>Descrição</label>
+        <textarea id="desc" placeholder="Detalhe o escopo do serviço..."></textarea>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input id="valor" type="text" placeholder="0,00">
+        </div>
+        <div class="field">
+          <label>Prazo</label>
+          <input id="prazo" type="text" placeholder="Ex: 15 dias">
+        </div>
+      </div>
+
+      <button class="btn-gen" onclick="gerar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        Gerar Orçamento
+      </button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <div class="card-label">Prévia do orçamento</div>
+
+      <div class="preview-empty" id="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <p>Preencha os dados ao lado<br>e clique em Gerar Orçamento</p>
+      </div>
+
+      <div id="orc" class="orcamento">
+        <div class="orc-top">
+          <div class="orc-top-left">
+            <h3>Orçamento</h3>
+            <div class="orc-empresa-name" id="orc-empresa"></div>
+          </div>
+          <div class="orc-number">
+            <strong id="orc-data"></strong>
+            Emitido hoje
+          </div>
+        </div>
+
+        <div class="orc-row">
+          <span class="orc-row-label">Cliente</span>
+          <span class="orc-row-val" id="orc-cliente"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Serviço</span>
+          <span class="orc-row-val" id="orc-servico"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Descrição</span>
+          <span class="orc-row-val" id="orc-desc"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Prazo</span>
+          <span class="orc-row-val" id="orc-prazo"></span>
+        </div>
+
+        <div class="orc-total">
+          <span class="orc-total-label">Valor Total</span>
+          <span class="orc-total-value" id="orc-valor"></span>
+        </div>
+
+        <div class="actions">
+          <button class="btn-act" onclick="copiar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copiar texto
+          </button>
+          <button class="btn-act" onclick="gerarPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Baixar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div class="field">
-<input id="cliente" placeholder="Cliente">
-</div>
-
-<div class="field">
-<input id="servico" placeholder="Serviço">
-</div>
-
-<div class="field">
-<textarea id="desc" placeholder="Descrição"></textarea>
-</div>
-
-<div class="field">
-<input id="valor" placeholder="Valor">
-<input id="prazo" placeholder="Prazo">
-</div>
-
-<button class="btn-gen" onclick="gerar()">Gerar orçamento</button>
-</div>
-
-
-<div>
-<div id="orc" class="orcamento">
-
-<div class="orc-header">
-<h3>ORÇAMENTO</h3>
-<p id="orc-empresa"></p>
-</div>
-
-<div class="orc-body">
-
-<div class="orc-row">
-<span>Cliente</span>
-<span id="orc-cliente"></span>
-</div>
-
-<div class="orc-row">
-<span>Serviço</span>
-<span id="orc-servico"></span>
-</div>
-
-<div class="orc-row">
-<span>Descrição</span>
-<span id="orc-desc"></span>
-</div>
-
-<div class="orc-row">
-<span>Prazo</span>
-<span id="orc-prazo"></span>
-</div>
-
-<div class="orc-total">
-<span>Total</span>
-<span id="orc-valor"></span>
-</div>
-
-<div class="actions">
-<button class="btn-act" onclick="copiar()">📋 Copiar</button>
-<button class="btn-act" onclick="gerarPDF()">📄 PDF</button>
-</div>
-
-<div id="copiado" class="copy-ok">Copiado!</div>
-
-</div>
-</div>
-</div>
-
-</div>
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <script>
+function gerar() {
+  const empresa = document.getElementById('empresa').value;
+  const cliente = document.getElementById('cliente').value;
+  const servico = document.getElementById('servico').value;
+  const desc    = document.getElementById('desc').value;
+  const prazo   = document.getElementById('prazo').value;
+  const valor   = document.getElementById('valor').value;
 
-function gerar(){
+  if (!empresa && !cliente && !servico) {
+    showToast('Preencha ao menos empresa, cliente e serviço', 'error');
+    return;
+  }
+
+  document.getElementById('empty-state').style.display = 'none';
   document.getElementById('orc').classList.add('show');
 
-  document.getElementById('orc-empresa').innerText = empresa.value;
-  document.getElementById('orc-cliente').innerText = cliente.value;
-  document.getElementById('orc-servico').innerText = servico.value;
-  document.getElementById('orc-desc').innerText = desc.value;
-  document.getElementById('orc-prazo').innerText = prazo.value;
-  document.getElementById('orc-valor').innerText = "R$ " + valor.value;
+  document.getElementById('orc-empresa').innerText = empresa || '—';
+  document.getElementById('orc-cliente').innerText = cliente || '—';
+  document.getElementById('orc-servico').innerText = servico || '—';
+  document.getElementById('orc-desc').innerText    = desc    || '—';
+  document.getElementById('orc-prazo').innerText   = prazo   || '—';
+  document.getElementById('orc-valor').innerText   = valor ? 'R$ ' + valor : '—';
+  document.getElementById('orc-data').innerText    = new Date().toLocaleDateString('pt-BR');
+
+  showToast('✓ Orçamento gerado!');
 }
 
-function copiar(){
-  const texto = `
-ORÇAMENTO
-
-Empresa: ${document.getElementById('orc-empresa').innerText}
-Cliente: ${document.getElementById('orc-cliente').innerText}
-Serviço: ${document.getElementById('orc-servico').innerText}
-Descrição: ${document.getElementById('orc-desc').innerText}
-Prazo: ${document.getElementById('orc-prazo').innerText}
-
-Valor total: ${document.getElementById('orc-valor').innerText}
-`;
-
-  const textarea = document.createElement("textarea");
-  textarea.value = texto;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
-
-  const aviso = document.getElementById('copiado');
-  aviso.style.display = "block";
-
-  setTimeout(()=> aviso.style.display = "none", 2000);
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
-function gerarPDF(){
+function copiar() {
+  const texto = `ORÇAMENTO\n\nEmpresa: ${document.getElementById('orc-empresa').innerText}\nCliente: ${document.getElementById('orc-cliente').innerText}\nServiço: ${document.getElementById('orc-servico').innerText}\nDescrição: ${document.getElementById('orc-desc').innerText}\nPrazo: ${document.getElementById('orc-prazo').innerText}\n\nValor total: ${document.getElementById('orc-valor').innerText}`;
+
+  navigator.clipboard.writeText(texto)
+    .then(() => showToast('✓ Texto copiado!'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('✓ Texto copiado!');
+    });
+}
+
+function gerarPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  doc.text("ORÇAMENTO", 20, 20);
-  doc.text("Empresa: " + document.getElementById('orc-empresa').innerText, 20, 40);
-  doc.text("Cliente: " + document.getElementById('orc-cliente').innerText, 20, 50);
-  doc.text("Serviço: " + document.getElementById('orc-servico').innerText, 20, 60);
-  doc.text("Descrição: " + document.getElementById('orc-desc').innerText, 20, 70);
-  doc.text("Prazo: " + document.getElementById('orc-prazo').innerText, 20, 80);
-  doc.text("Valor total: " + document.getElementById('orc-valor').innerText, 20, 100);
+  const empresa = document.getElementById('orc-empresa').innerText;
+  const cliente = document.getElementById('orc-cliente').innerText;
+  const servico = document.getElementById('orc-servico').innerText;
+  const desc    = document.getElementById('orc-desc').innerText;
+  const prazo   = document.getElementById('orc-prazo').innerText;
+  const valor   = document.getElementById('orc-valor').innerText;
+  const data    = document.getElementById('orc-data').innerText;
 
-  doc.save("orcamento.pdf");
+  // Header
+  doc.setFillColor(15, 27, 21);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(31, 204, 122);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text('BudgetPro', 20, 18);
+  doc.setFontSize(10);
+  doc.setTextColor(120, 160, 138);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Orçamento Profissional', 20, 27);
+  doc.text('Data: ' + data, 150, 27);
+
+  // Empresa
+  doc.setTextColor(31, 204, 122);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text(empresa, 20, 55);
+
+  doc.setDrawColor(31, 204, 122);
+  doc.setLineWidth(0.3);
+  doc.line(20, 60, 190, 60);
+
+  const rows = [
+    ['Cliente',   cliente],
+    ['Serviço',   servico],
+    ['Descrição', desc],
+    ['Prazo',     prazo],
+  ];
+
+  let y = 72;
+  doc.setFontSize(10);
+  rows.forEach(([label, val]) => {
+    doc.setTextColor(120, 160, 138);
+    doc.setFont('helvetica', 'normal');
+    doc.text(label, 20, y);
+    doc.setTextColor(230, 242, 236);
+    doc.setFont('helvetica', 'bold');
+    const lines = doc.splitTextToSize(val, 120);
+    doc.text(lines, 75, y);
+    y += lines.length > 1 ? lines.length * 7 + 4 : 12;
+  });
+
+  y += 6;
+  doc.setFillColor(18, 66, 49);
+  doc.roundedRect(20, y, 170, 22, 4, 4, 'F');
+  doc.setTextColor(120, 160, 138);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('VALOR TOTAL', 30, y + 14);
+  doc.setTextColor(31, 204, 122);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(valor, 190 - doc.getTextWidth(valor) - 10, y + 15);
+
+  doc.setFillColor(15, 27, 21);
+  doc.rect(0, 275, 210, 22, 'F');
+  doc.setTextColor(60, 90, 74);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Gerado com BudgetPro', 20, 285);
+  doc.text(data, 190 - doc.getTextWidth(data), 285);
+
+  doc.save('orcamento_' + empresa.replace(/\s+/g, '_').toLowerCase() + '.pdf');
+  showToast('✓ PDF baixado!');
 }
-
 </script>
 
 </body>
 </html>
-
