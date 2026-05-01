@@ -3,6 +3,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -105,8 +106,28 @@ h1{font-family:Arial, Helvetica, sans-serif;font-size:clamp(2.6rem,5.5vw,4.2rem)
 .btn-big svg{transition:.25s}
 .btn-big:hover svg{transform:translateX(4px)}
 
-footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center}
+footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
 footer p{font-size:12px;color:rgba(255,255,255,.18)}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.25rem;gap:.5rem}
+  .nav-links{display:none}
+  .nav-cta{font-size:12px;padding:7px 12px;white-space:nowrap}
+  .hero{padding:3rem 1.25rem 2rem}
+  h1{font-size:clamp(2rem,8vw,3rem)}
+  .mock-grid{grid-template-columns:1fr}
+  .mg-l{border-right:none;border-bottom:1px solid var(--border)}
+  .stats{flex-direction:column;align-items:center;gap:1.5rem;padding:2rem 1.25rem}
+  .feats{grid-template-columns:1fr}
+  .cta{padding:3rem 1.25rem}
+  footer{flex-direction:column;align-items:center;text-align:center;padding:1.25rem}
+}
+@media(max-width:480px){
+  .badge{font-size:10px;padding:5px 10px}
+  .btns{flex-direction:column;align-items:stretch}
+  .btn{justify-content:center}
+  .mock-wrap{margin:2rem auto 0}
+}
 </style>
 </head>
 <body>
