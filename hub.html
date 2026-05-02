@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Painel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #060d09;
+  --surface:    #0b1610;
+  --surface2:   #101e16;
+  --green:      #20d47e;
+  --green-2:    #17a862;
+  --green-glow: rgba(32, 212, 126, 0.18);
+  --gold:       #c9a84c;
+  --text:       #eaf3ed;
+  --text-2:     #6e9c7e;
+  --text-3:     #2e4d38;
+  --border:     rgba(32, 212, 126, 0.1);
+  --border2:    rgba(255,255,255,0.05);
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(32,212,126,0.1) 0%, transparent 60%);
+  top: -300px; left: -200px;
+  animation: float1 14s ease-in-out infinite;
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(32,212,126,0.06) 0%, transparent 60%);
+  bottom: -150px; right: -150px;
+  animation: float2 18s ease-in-out infinite;
+}
+.orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 60%);
+  top: 50%; left: 60%;
+  animation: float1 22s ease-in-out infinite reverse;
+}
+@keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,60px)} }
+@keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,-40px)} }
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.75rem 3rem;
+  border-bottom: 1px solid var(--border2);
+  backdrop-filter: blur(20px);
+  background: rgba(6,13,9,0.6);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  animation: fadeDown 0.5s ease both;
+}
+
+.logo { display: flex; align-items: center; gap: 0.65rem; }
+
+.logo-mark {
+  width: 34px; height: 34px;
+  background: var(--green);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(32,212,126,0.3);
+}
+
+.logo-mark svg { width: 17px; height: 17px; }
+
+.logo-name {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.logo-name span { color: var(--green); }
+
+.header-right { display: flex; align-items: center; gap: 1rem; }
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  padding: 0.4rem 1rem 0.4rem 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.user-avatar {
+  width: 26px; height: 26px;
+  background: var(--green-2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.btn-logout {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover { border-color: var(--text-3); color: var(--text); }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+}
+
+.greeting {
+  text-align: center;
+  margin-bottom: 4rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.greeting-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 1rem;
+  background: rgba(32,212,126,0.07);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.35rem 1rem;
+}
+
+.pulse {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+.greeting h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.greeting h1 em { font-style: italic; color: var(--green); }
+
+.greeting p {
+  font-size: 0.95rem;
+  color: var(--text-2);
+  font-weight: 300;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 920px;
+}
+
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  animation: fadeUp 0.5s ease both;
+  animation-fill-mode: both;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 0%, var(--card-glow, rgba(32,212,126,0.08)) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.card:hover::before { opacity: 1; }
+
+.card:hover {
+  border-color: var(--card-accent, var(--green));
+  transform: translateY(-5px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px var(--card-accent, var(--green));
+}
+
+.card.soon { opacity: 0.55; cursor: default; pointer-events: none; }
+
+.card-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon-wrap svg { width: 24px; height: 24px; }
+
+.card-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--text-2);
+  line-height: 1.65;
+  font-weight: 300;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border2);
+}
+
+.card-cta {
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: gap 0.2s;
+}
+
+.card:hover .card-cta { gap: 0.7rem; }
+
+.card-cta svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.card:hover .card-cta svg { transform: translateX(3px); }
+
+.card-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 50px;
+}
+
+/* Themes */
+.card-orcamento { --card-accent: #20d47e; --card-glow: rgba(32,212,126,0.1); animation-delay: 0.3s; }
+.card-orcamento .card-icon-wrap { background: rgba(32,212,126,0.1); box-shadow: 0 0 30px rgba(32,212,126,0.12); }
+.card-orcamento .card-icon-wrap svg { color: #20d47e; }
+.card-orcamento .card-tag { color: #20d47e; }
+.card-orcamento .card-cta { color: #20d47e; }
+.card-orcamento .card-badge { background: rgba(32,212,126,0.1); color: #20d47e; border: 1px solid rgba(32,212,126,0.2); }
+
+.card-dashboard { --card-accent: #3db8c8; --card-glow: rgba(61,184,200,0.08); animation-delay: 0.4s; }
+.card-dashboard .card-icon-wrap { background: rgba(61,184,200,0.1); box-shadow: 0 0 30px rgba(61,184,200,0.1); }
+.card-dashboard .card-icon-wrap svg { color: #3db8c8; }
+.card-dashboard .card-tag { color: #3db8c8; }
+.card-dashboard .card-cta { color: #3db8c8; }
+.card-dashboard .card-badge { background: rgba(61,184,200,0.08); color: #3db8c8; border: 1px solid rgba(61,184,200,0.2); }
+
+.card-historico { --card-accent: #c9a84c; --card-glow: rgba(201,168,76,0.08); animation-delay: 0.5s; }
+.card-historico .card-icon-wrap { background: rgba(201,168,76,0.08); box-shadow: 0 0 30px rgba(201,168,76,0.08); }
+.card-historico .card-icon-wrap svg { color: #c9a84c; }
+.card-historico .card-tag { color: #c9a84c; }
+.card-historico .card-cta { color: var(--text-3); }
+.card-historico .card-badge { background: rgba(201,168,76,0.06); color: var(--text-3); border: 1px solid rgba(201,168,76,0.1); }
+
+/* Corner deco on primary card */
+.corner-deco {
+  position: absolute;
+  top: 0; right: 0;
+  width: 90px; height: 90px;
+  background: conic-gradient(from 180deg at 100% 0%, rgba(32,212,126,0.12), transparent 40%);
+  border-radius: 0 20px 0 0;
+  pointer-events: none;
+}
+
+.stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border2);
+  width: 100%;
+  max-width: 920px;
+  animation: fadeUp 0.6s 0.6s ease both;
+  animation-fill-mode: both;
+}
+
+.stat { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-num span { color: var(--green); }
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+.stat-divider { width: 1px; height: 30px; background: var(--border2); }
+
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--text-3);
+  border-top: 1px solid var(--border2);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 800px) {
+  header { padding: 1.25rem 1.5rem; }
+  .user-pill span { display: none; }
+  .cards { grid-template-columns: 1fr; max-width: 440px; }
+  .stats-bar { gap: 1.5rem; flex-wrap: wrap; }
+  main { padding: 2.5rem 1.25rem; }
+  .greeting { margin-bottom: 2.5rem; }
+}
+
+@media (max-width: 480px) {
+  .greeting h1 { font-size: 2rem; }
+  .btn-logout { display: none; }
+  .stat-divider { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="page">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#060d09" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <span class="logo-name">Budget<span>Pro</span></span>
+    </div>
+    <div class="header-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="avatar-initials">U</div>
+        <span id="user-email-display">usuário</span>
+      </div>
+      <button class="btn-logout" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="greeting">
+      <div class="greeting-eyebrow">
+        <div class="pulse"></div>
+        Painel de controle
+      </div>
+      <h1>O que vamos<br>fazer <em>hoje?</em></h1>
+      <p>Escolha uma das opções abaixo e gerencie seu negócio com agilidade e profissionalismo.</p>
+    </div>
+
+    <div class="cards">
+
+      <!-- CRIAR ORÇAMENTO -->
+      <a class="card card-orcamento" href="budgetpro_app.html">
+        <div class="corner-deco"></div>
+        <div class="card-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <div class="card-tag">Principal</div>
+        <div class="card-title">Criar Orçamento</div>
+        <div class="card-desc">Gere propostas profissionais em segundos. Preencha os dados, visualize em tempo real e exporte em PDF ou WhatsApp.</div>
+        <div class="card-footer">
+          <div class="card-cta">
+            Acessar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+          <div class="card-badge">Disponível</div>
+        </div>
+      </a>
+
+      <!-- DASHBOARD -->
+      <a class="card card-dashboard" href="dashboard.html">
+        <div class="card-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <div class="card-tag">Análises</div>
+        <div class="card-title">Dashboard</div>
+        <div class="card-desc">Visualize seu desempenho, receita acumulada, taxa de aprovação e evolução mês a mês num painel completo.</div>
+        <div class="card-footer">
+          <div class="card-cta">
+            Acessar
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+          <div class="card-badge">Disponível</div>
+        </div>
+      </a>
+
+      <!-- HISTÓRICO — em breve -->
+      <div class="card card-historico soon">
+        <div class="card-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="card-tag">Registros</div>
+        <div class="card-title">Histórico</div>
+        <div class="card-desc">Consulte todos os orçamentos emitidos, filtre por período, cliente ou status e acompanhe seu pipeline de vendas.</div>
+        <div class="card-footer">
+          <div class="card-cta" style="color:var(--text-3)">
+            Em breve
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+          <div class="card-badge">Em breve</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num"><span>+</span>2K</div>
+        <div class="stat-label">Orçamentos gerados</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">30<span>s</span></div>
+        <div class="stat-label">Tempo médio</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">R$<span>0</span></div>
+        <div class="stat-label">Para começar</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num">4.9<span>★</span></div>
+        <div class="stat-label">Avaliação</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>© 2025 BudgetPro · Feito para quem trabalha de verdade 💚</footer>
+
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80",
+  measurementId: "G-YG55PF92J6"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById('user-email-display').textContent = user.email;
+    document.getElementById('avatar-initials').textContent = user.email.slice(0, 2).toUpperCase();
+  } else {
+    window.location.href = 'login.html';
+  }
+});
+
+function sair() {
+  auth.signOut().then(() => window.location.href = 'login.html');
+}
+</script>
+</body>
+</html>

@@ -524,7 +524,7 @@ function login() {
   auth.signInWithEmailAndPassword(email, senha)
     .then(() => {
       showToast("✓ Login realizado!");
-      setTimeout(() => window.location.href = "budgetpro_app.html", 1000);
+      setTimeout(() => window.location.href = "hub.html", 1000);
     })
     .catch((erro) => showToast(erro.message, 'error'));
 }
