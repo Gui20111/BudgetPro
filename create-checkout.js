@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+const Stripe = require('stripe');
+
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -9,9 +11,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Dados incompletos' });
   }
 
-  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
   try {
+    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -27,4 +29,4 @@ export default async function handler(req, res) {
     console.error('Stripe error:', err);
     return res.status(500).json({ error: err.message });
   }
-}
+};
