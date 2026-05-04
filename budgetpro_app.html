@@ -574,7 +574,38 @@ auth.onAuthStateChanged(user => {
   if (!user) window.location.href = 'login.html';
 });
 
-function gerar() {
+async function gerar() {
+  const user = auth.currentUser;
+  if (!user) { showToast('Faça login primeiro', 'error'); return; }
+
+  // Busca dados do usuário
+  const userDoc = await db.collection('usuarios').doc(user.uid).get();
+  const dados = userDoc.data() || {};
+  const plano = dados.plano || 'gratuito';
+  const mesAtual = new Date().getMonth();
+
+  // Reseta contador se mudou o mês
+  let orcamentosNoMes = dados.orcamentosNoMes || 0;
+  if (dados.mesAtual !== mesAtual) {
+    orcamentosNoMes = 0;
+    await db.collection('usuarios').doc(user.uid).update({
+      orcamentosNoMes: 0,
+      mesAtual: mesAtual
+    });
+  }
+
+  // Bloqueia se for gratuito e já usou 5
+  if (plano === 'gratuito' && orcamentosNoMes >= 5) {
+    mostrarModalUpgrade();
+    return;
+  }
+
+  // Incrementa contador
+  await db.collection('usuarios').doc(user.uid).update({
+    orcamentosNoMes: orcamentosNoMes + 1
+  });
+
+  // Gera o orçamento normalmente
   const empresa = document.getElementById('empresa').value;
   const cliente = document.getElementById('cliente').value;
   const servico = document.getElementById('servico').value;
@@ -596,6 +627,48 @@ function gerar() {
   document.getElementById('orc-desc').innerText    = desc    || '—';
   document.getElementById('orc-prazo').innerText   = prazo   || '—';
   document.getElementById('orc-valor').innerText   = valor ? 'R$ ' + valor : '—';
+  document.getElementById('orc-data').innerText    = new Date().toLocaleDateString('pt-BR');
+
+  showToast('✓ Orçamento gerado!');
+  document.getElementById('btn-salvar').disabled = false;
+  document.getElementById('btn-salvar').style.opacity = '1';
+  document.getElementById('btn-salvar').style.pointerEvents = 'auto';
+}
+
+function mostrarModalUpgrade() {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+    z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;
+  `;
+  modal.innerHTML = `
+    <div style="background:#0c1912;border:1px solid rgba(30,224,127,.2);border-radius:20px;padding:2.5rem;max-width:400px;width:100%;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:1rem">🚀</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:.75rem;color:#dff0e6">Limite atingido!</h3>
+      <p style="font-size:.88rem;color:#5e8c6e;margin-bottom:1.5rem;line-height:1.6">
+        Você usou seus <strong style="color:#dff0e6">5 orçamentos gratuitos</strong> deste mês.<br>
+        Faça upgrade para continuar gerando sem limites!
+      </p>
+      <a href="pricing.html" style="display:block;width:100%;padding:.9rem;background:#1ee07f;color:#07100c;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;text-decoration:none;margin-bottom:.75rem;">
+        ⚡ Fazer upgrade agora
+      </a>
+      <button onclick="this.closest('div').parentElement.remove()" style="width:100%;padding:.75rem;background:transparent;color:#5e8c6e;border:1px solid rgba(255,255,255,.05);border-radius:11px;cursor:pointer;font-family:'Syne',sans-serif;">
+        Cancelar
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('orc').classList.add('show');
+
+  document.getElementById('orc-empresa').innerText = empresa || '—';
+  document.getElementById('orc-cliente').innerText = cliente || '—';
+  document.getElementById('orc-servico').innerText = servico || '—';
+  document.getElementById('orc-desc').innerText    = desc    || '—';
+  document.getElementById('orc-prazo').innerText   = prazo   || '—';
+  document.getElementById('orc-valor').innerText   = valor ? 'R$ ' + valor : '—';
   const hoje = new Date();
   document.getElementById('orc-data').innerText = hoje.toLocaleDateString('pt-BR');
 
@@ -604,7 +677,7 @@ function gerar() {
   document.getElementById('btn-salvar').disabled = false;
   document.getElementById('btn-salvar').style.opacity = '1';
   document.getElementById('btn-salvar').style.pointerEvents = 'auto';
-}
+
 
 let toastTimer;
 function showToast(msg, type = '') {

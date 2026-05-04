@@ -486,6 +486,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -500,6 +501,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 let toastTimer;
 function showToast(msg, type = '') {
@@ -514,10 +516,18 @@ function cadastrar() {
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
   auth.createUserWithEmailAndPassword(email, senha)
+    .then((result) => {
+      // Cria o plano gratuito no Firestore
+      return db.collection('usuarios').doc(result.user.uid).set({
+        plano: 'gratuito',
+        orcamentosNoMes: 0,
+        mesAtual: new Date().getMonth(),
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
     .then(() => showToast("✓ Conta criada com sucesso!"))
     .catch((erro) => showToast(erro.message, 'error'));
 }
-
 function login() {
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
