@@ -483,50 +483,27 @@ footer {
         </div>
       </a>
 
-      <!-- DASHBOARD -->
-      <a class="card card-dashboard" href="dashboard.html">
-        <div class="card-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-          </svg>
-        </div>
-        <div class="card-tag">Análises</div>
-        <div class="card-title">Dashboard</div>
-        <div class="card-desc">Visualize seu desempenho, receita acumulada, taxa de aprovação e evolução mês a mês num painel completo.</div>
-        <div class="card-footer">
-          <div class="card-cta">
-            Acessar
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </div>
-          <div class="card-badge">Disponível</div>
-        </div>
-      </a>
-
-      <!-- HISTÓRICO — em breve -->
-      <div class="card card-historico soon">
-        <div class="card-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div class="card-tag">Registros</div>
-        <div class="card-title">Histórico</div>
-        <div class="card-desc">Consulte todos os orçamentos emitidos, filtre por período, cliente ou status e acompanhe seu pipeline de vendas.</div>
-        <div class="card-footer">
-          <div class="card-cta" style="color:var(--text-3)">
-            Em breve
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </div>
-          <div class="card-badge">Em breve</div>
-        </div>
-      </div>
-
+     <!-- DASHBOARD -->
+<div class="card card-dashboard" id="card-dashboard" onclick="acessarDashboard()">
+  <div class="card-icon-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+  </div>
+  <div class="card-tag">Análises</div>
+  <div class="card-title">Dashboard</div>
+  <div class="card-desc">Visualize seu desempenho, receita acumulada, taxa de aprovação e evolução mês a mês num painel completo.</div>
+  <div class="card-footer">
+    <div class="card-cta">
+      Acessar
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div class="card-badge" id="dashboard-badge">Pro</div>
+  </div>
+</div>
     </div>
 
     <div class="stats-bar">
@@ -557,9 +534,10 @@ footer {
 
 </div>
 
-<!-- Firebase -->
+<!-- Firebase e firestore -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -574,6 +552,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 auth.onAuthStateChanged((user) => {
   if (user) {
@@ -583,6 +562,40 @@ auth.onAuthStateChanged((user) => {
     window.location.href = 'login.html';
   }
 });
+async function acessarDashboard() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const doc = await db.collection('usuarios').doc(user.uid).get();
+  const plano = doc.data()?.plano || 'gratuito';
+
+  if (plano === 'gratuito') {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+      z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;
+    `;
+    modal.innerHTML = `
+      <div style="background:#0b1610;border:1px solid rgba(32,212,126,.2);border-radius:20px;padding:2.5rem;max-width:400px;width:100%;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:1rem">📊</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:.75rem;color:#eaf3ed">Dashboard é Pro!</h3>
+        <p style="font-size:.88rem;color:#6e9c7e;margin-bottom:1.5rem;line-height:1.6">
+          O dashboard completo com métricas, gráficos e evolução de receita está disponível no plano <strong style="color:#eaf3ed">Pro</strong>.
+        </p>
+        <a href="pricing.html" style="display:block;width:100%;padding:.9rem;background:#1ee07f;color:#060d09;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;text-decoration:none;margin-bottom:.75rem;">
+          ⚡ Fazer upgrade agora
+        </a>
+        <button onclick="this.closest('div').parentElement.remove()" style="width:100%;padding:.75rem;background:transparent;color:#6e9c7e;border:1px solid rgba(255,255,255,.05);border-radius:11px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          Cancelar
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    return;
+  }
+
+  window.location.href = 'dashboard.html';
+}
 
 function sair() {
   auth.signOut().then(() => window.location.href = 'login.html');
