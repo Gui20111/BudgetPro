@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Pagamento confirmado!</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg:#07100c;--green:#1ee07f;--text:#e0f0e6;--text2:#5e8c6e;--s1:#0c1912;--border2:rgba(255,255,255,.05); }
+html, body { min-height:100vh;background:var(--bg);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;display:flex;align-items:center;justify-content:center; }
+.orb { position:fixed;border-radius:50%;filter:blur(150px);pointer-events:none; }
+.orb1 { width:500px;height:500px;background:radial-gradient(circle,rgba(30,224,127,.12) 0%,transparent 65%);top:-100px;left:-100px; }
+.card { position:relative;z-index:1;background:var(--s1);border:1px solid rgba(30,224,127,.2);border-radius:24px;padding:3rem 2.5rem;max-width:440px;width:100%;text-align:center;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes pop { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+.check { width:72px;height:72px;background:rgba(30,224,127,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;animation:checkIn .6s .2s ease both; }
+@keyframes checkIn { from{transform:scale(0) rotate(-180deg)} to{transform:scale(1) rotate(0)} }
+.check svg { width:32px;height:32px;stroke:var(--green); }
+h1 { font-family:'Instrument Serif',serif;font-size:2.2rem;margin-bottom:.5rem; }
+h1 em { font-style:italic;color:var(--green); }
+p { font-size:.9rem;color:var(--text2);margin-bottom:2rem;line-height:1.7; }
+.plan-badge { display:inline-flex;align-items:center;gap:.5rem;background:rgba(30,224,127,.1);border:1px solid rgba(30,224,127,.2);color:var(--green);font-size:.8rem;font-weight:700;padding:.4rem 1rem;border-radius:50px;margin-bottom:1.5rem; }
+.btn { display:block;width:100%;padding:.9rem;background:var(--green);color:#07100c;border:none;border-radius:11px;font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s; }
+.btn:hover { background:#25f090; }
+.countdown { font-size:.78rem;color:var(--text2);margin-top:1rem; }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="card">
+  <div class="check">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <div class="plan-badge" id="plan-badge">⚡ Plano Pro ativado!</div>
+  <h1>Bem-vindo ao<br><em>Pro!</em></h1>
+  <p>Seu pagamento foi confirmado e seu plano já está ativo. Aproveite todos os recursos sem limites!</p>
+  <a class="btn" href="hub.html">Ir para o painel →</a>
+  <div class="countdown" id="countdown">Redirecionando em 5s...</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const doc = await db.collection('usuarios').doc(user.uid).get();
+    const plano = doc.data()?.plano || 'pro';
+    const names = { pro: 'Pro', business: 'Business' };
+    document.getElementById('plan-badge').textContent = `⚡ Plano ${names[plano] || 'Pro'} ativado!`;
+    document.querySelector('h1').innerHTML = `Bem-vindo ao<br><em>${names[plano] || 'Pro'}!</em>`;
+  }
+});
+
+let s = 5;
+const cd = document.getElementById('countdown');
+const t = setInterval(() => {
+  s--;
+  cd.textContent = `Redirecionando em ${s}s...`;
+  if (s <= 0) { clearInterval(t); window.location.href = 'hub.html'; }
+}, 1000);
+</script>
+</body>
+</html>
