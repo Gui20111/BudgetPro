@@ -659,7 +659,7 @@ function mostrarModalUpgrade() {
   `;
   document.body.appendChild(modal);
 }
-
+{
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('orc').classList.add('show');
 
@@ -678,6 +678,11 @@ function mostrarModalUpgrade() {
   document.getElementById('btn-salvar').style.opacity = '1';
   document.getElementById('btn-salvar').style.pointerEvents = 'auto';
 
+ // ← adiciona esse aqui
+  document.body.appendChild(modal);
+
+}
+ // ← e esse aqui fecha o gerar()
 
 let toastTimer;
 function showToast(msg, type = '') {
