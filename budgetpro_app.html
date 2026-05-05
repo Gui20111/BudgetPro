@@ -583,7 +583,7 @@ async function gerar() {
   const dados = userDoc.data() || {};
   const plano = dados.plano || 'gratuito';
   const mesAtual = new Date().getMonth();
-
+}
   // Reseta contador se mudou o mês
   let orcamentosNoMes = dados.orcamentosNoMes || 0;
   if (dados.mesAtual !== mesAtual) {
@@ -616,7 +616,7 @@ async function gerar() {
   if (!empresa && !cliente && !servico) {
     showToast('Preencha ao menos empresa, cliente e serviço', 'error');
     return;
-  }
+  
 
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('orc').classList.add('show');
@@ -634,6 +634,7 @@ async function gerar() {
   document.getElementById('btn-salvar').style.opacity = '1';
   document.getElementById('btn-salvar').style.pointerEvents = 'auto';
 }
+
 
 function mostrarModalUpgrade() {
   const modal = document.createElement('div');
