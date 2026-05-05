@@ -678,12 +678,10 @@ function mostrarModalUpgrade() {
   document.getElementById('btn-salvar').style.opacity = '1';
   document.getElementById('btn-salvar').style.pointerEvents = 'auto';
 
- // ← adiciona esse aqui
-  document.body.appendChild(modal);
-
 }
- // ← e esse aqui fecha o gerar()
-
+ {// ← e esse aqui fecha o gerar() } // ← adiciona esse aqui
+  document.body.appendChild(modal);
+}
 let toastTimer;
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
