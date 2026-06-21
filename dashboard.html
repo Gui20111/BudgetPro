@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Epilogue:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#07100c;--s1:#0c1912;--s2:#111f17;--s3:#162819;
+  --green:#1ee07f;--green-d:#12a659;--green-g:rgba(30,224,127,.12);
+  --teal:#2ecfb8;--gold:#e8c55a;--red:#f2645a;
+  --text:#dff0e6;--text2:#5e8c6e;--text3:#2a4a33;
+  --border:rgba(30,224,127,.08);--border2:rgba(255,255,255,.05);
+}
+html,body { min-height:100vh;background:var(--bg);color:var(--text);font-family:'Epilogue',sans-serif;overflow-x:hidden; }
+
+.orb { position:fixed;border-radius:50%;filter:blur(150px);pointer-events:none;z-index:0; }
+.orb1 { width:600px;height:600px;background:radial-gradient(circle,rgba(30,224,127,.09) 0%,transparent 65%);top:-200px;left:-150px;animation:o1 16s ease-in-out infinite; }
+.orb2 { width:400px;height:400px;background:radial-gradient(circle,rgba(46,207,184,.06) 0%,transparent 65%);bottom:-100px;right:-100px;animation:o2 20s ease-in-out infinite; }
+@keyframes o1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,60px)}}
+@keyframes o2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
+
+.wrap { position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 2rem 4rem; }
+
+header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.6rem 2rem;border-bottom:1px solid var(--border2);
+  background:rgba(7,16,12,.75);backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:50;animation:fd .5s ease both;
+}
+.logo { display:flex;align-items:center;gap:.6rem; }
+.logo-mark { width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(30,224,127,.3); }
+.logo-mark svg { width:16px;height:16px; }
+.logo-name { font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem; }
+.logo-name span { color:var(--green); }
+.header-r { display:flex;align-items:center;gap:.75rem; }
+.back-btn {
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--s2);border:1px solid var(--border2);color:var(--text2);
+  font-family:'Epilogue',sans-serif;font-size:.8rem;padding:.4rem .9rem;
+  border-radius:8px;cursor:pointer;transition:.2s;text-decoration:none;
+}
+.back-btn:hover { border-color:var(--green);color:var(--green); }
+.back-btn svg { width:14px;height:14px; }
+.user-pill { display:flex;align-items:center;gap:.5rem;background:var(--s2);border:1px solid var(--border2);border-radius:50px;padding:.35rem .9rem .35rem .4rem;font-size:.8rem;color:var(--text2); }
+.avatar { width:24px;height:24px;background:var(--green-d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff; }
+
+.page-top { display:flex;align-items:flex-end;justify-content:space-between;padding:2.5rem 0 2rem;animation:fu .5s .1s ease both;animation-fill-mode:both; }
+.page-top-l h1 { font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.3rem; }
+.page-top-l p { font-size:.88rem;color:var(--text2);font-weight:300; }
+.period-tabs { display:flex;gap:.4rem; }
+.tab { padding:.4rem .9rem;border-radius:8px;font-size:.78rem;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:'Epilogue',sans-serif;transition:.2s; }
+.tab.active { background:var(--green);color:#07100c;border-color:var(--green); }
+.tab:hover:not(.active) { border-color:var(--text3);color:var(--text); }
+
+.kpis { display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;animation:fu .5s .2s ease both;animation-fill-mode:both; }
+.kpi { background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:1.5rem;position:relative;overflow:hidden;transition:.3s; }
+.kpi::after { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-color,var(--green));opacity:.5;transition:.3s; }
+.kpi:hover { border-color:var(--kpi-color,var(--green));transform:translateY(-2px); }
+.kpi:hover::after { opacity:1; }
+.kpi-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:16px; }
+.kpi-label { font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);margin-bottom:.4rem; }
+.kpi-value { font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.03em;line-height:1; }
+.kpi-delta { display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:500;margin-top:.5rem;padding:.15rem .5rem;border-radius:50px; }
+.up { background:rgba(30,224,127,.1);color:var(--green); }
+.kpi-sub { font-size:.75rem;color:var(--text2);margin-top:.4rem;font-weight:300; }
+
+.main-grid { display:grid;grid-template-columns:1fr 320px;gap:1.25rem;animation:fu .5s .35s ease both;animation-fill-mode:both; }
+
+.card { background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:1.5rem; }
+.card-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem; }
+.card-title { font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:-.01em; }
+.card-badge { font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .55rem;border-radius:50px;background:rgba(30,224,127,.08);color:var(--green);border:1px solid rgba(30,224,127,.15); }
+
+.chart-wrap { position:relative;width:100%;height:220px; }
+svg.chart { width:100%;height:100%; }
+.chart-line { fill:none;stroke:var(--green);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round; }
+.chart-area { fill:url(#areaGrad); }
+.chart-dot { fill:var(--green);stroke:var(--s1);stroke-width:2.5;cursor:pointer;transition:r .15s; }
+.chart-label { font-family:'Epilogue',sans-serif;font-size:10px;fill:var(--text2); }
+.tooltip { position:absolute;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:.55rem .85rem;font-size:.78rem;pointer-events:none;opacity:0;transition:.15s;white-space:nowrap;z-index:10; }
+.tooltip strong { color:var(--green);font-family:'Syne',sans-serif; }
+
+.donut-wrap { display:flex;flex-direction:column;align-items:center;gap:1.25rem; }
+.donut-label-wrap { position:relative;display:flex;align-items:center;justify-content:center; }
+.donut-svg { width:150px;height:150px; }
+.donut-track { fill:none;stroke:var(--s2);stroke-width:18; }
+.donut-fill { fill:none;stroke-width:18;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+.donut-inner { position:absolute;text-align:center; }
+.donut-num { font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--green); }
+.donut-legend { width:100%; }
+.legend-row { display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border2); }
+.legend-row:last-child { border:none; }
+.legend-l { display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--text2); }
+.legend-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.legend-val { font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700; }
+
+.bottom-grid { display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem;animation:fu .5s .45s ease both;animation-fill-mode:both; }
+
+.bars-wrap { display:flex;align-items:flex-end;gap:.6rem;height:120px; }
+.bar-col { display:flex;flex-direction:column;align-items:center;gap:.4rem;flex:1; }
+.bar-track { width:100%;background:var(--s2);border-radius:5px;overflow:hidden;position:relative; }
+.bar-fill { position:absolute;bottom:0;left:0;right:0;border-radius:5px;background:var(--green);transition:height 1s cubic-bezier(.4,0,.2,1); }
+.bar-fill.teal { background:var(--teal); }
+.bar-label { font-size:.68rem;color:var(--text2);white-space:nowrap; }
+
+.recents { display:flex;flex-direction:column;gap:.5rem;max-height:210px;overflow-y:auto; }
+.recents::-webkit-scrollbar { width:3px; }
+.recents::-webkit-scrollbar-thumb { background:var(--text3);border-radius:10px; }
+.recent-item { display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:var(--s2);border-radius:10px;border:1px solid transparent;transition:.2s; }
+.recent-item:hover { border-color:var(--border); }
+.recent-l { display:flex;flex-direction:column;gap:.15rem; }
+.recent-name { font-size:.85rem;font-weight:500; }
+.recent-date { font-size:.72rem;color:var(--text2); }
+.recent-r { display:flex;flex-direction:column;align-items:flex-end;gap:.15rem; }
+.recent-val { font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--green); }
+.sdot { width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:.3rem; }
+.sdot.pend { background:var(--gold); }
+.sdot.rec { background:var(--red); }
+.recent-status { font-size:.68rem;color:var(--text2); }
+
+@keyframes fu { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fd { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+
+@media(max-width:900px) {
+  .kpis { grid-template-columns:repeat(2,1fr); }
+  .main-grid { grid-template-columns:1fr; }
+  .bottom-grid { grid-template-columns:1fr; }
+  .page-top { flex-direction:column;align-items:flex-start;gap:1rem; }
+}
+@media(max-width:560px) {
+  .wrap { padding:0 1rem 3rem; }
+  header { padding:1.1rem 1.25rem; }
+  .kpi-value { font-size:1.5rem; }
+  .period-tabs { flex-wrap:wrap; }
+  .user-pill span { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#07100c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">Budget<span>Pro</span></span>
+  </div>
+  <div class="header-r">
+    <a class="back-btn" href="hub.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Voltar ao painel
+    </a>
+    <div class="user-pill">
+      <div class="avatar" id="avatar">U</div>
+      <span id="user-email">usuário</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="page-top">
+    <div class="page-top-l">
+      <h1>Dashboard</h1>
+      <p>Acompanhe sua performance e receita em tempo real</p>
+    </div>
+    <div class="period-tabs">
+      <button class="tab" onclick="setPeriod('3m',this)">3 meses</button>
+      <button class="tab active" onclick="setPeriod('6m',this)">6 meses</button>
+      <button class="tab" onclick="setPeriod('12m',this)">12 meses</button>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi" style="--kpi-color:#1ee07f">
+      <div class="kpi-icon" style="background:rgba(30,224,127,.1)">💰</div>
+      <div class="kpi-label">Receita acumulada</div>
+      <div class="kpi-value" id="kpi-receita">—</div>
+      <div class="kpi-delta up">↑ +23% vs anterior</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#2ecfb8">
+      <div class="kpi-icon" style="background:rgba(46,207,184,.1)">📋</div>
+      <div class="kpi-label">Orçamentos emitidos</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-delta up">↑ no período</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#e8c55a">
+      <div class="kpi-icon" style="background:rgba(232,197,90,.1)">✅</div>
+      <div class="kpi-label">Taxa de aprovação</div>
+      <div class="kpi-value" id="kpi-taxa">—</div>
+      <div class="kpi-delta up">↑ +4pp vs anterior</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f2645a">
+      <div class="kpi-icon" style="background:rgba(242,100,90,.1)">📈</div>
+      <div class="kpi-label">Ticket médio</div>
+      <div class="kpi-value" id="kpi-ticket">—</div>
+      <div class="kpi-delta up">↑ +12% vs anterior</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Evolução de Receita</span>
+        <span class="card-badge" id="chart-badge">Últimos 6 meses</span>
+      </div>
+      <div class="chart-wrap" id="chart-wrap">
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Status dos Orçamentos</span>
+        <span class="card-badge">Período</span>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut-label-wrap">
+          <svg class="donut-svg" viewBox="0 0 150 150" id="donut-svg">
+            <circle class="donut-track" cx="75" cy="75" r="58"/>
+            <circle class="donut-fill" id="donut-arc" cx="75" cy="75" r="58"
+              stroke="#1ee07f" stroke-dasharray="364.4" stroke-dashoffset="364.4"
+              style="transform-origin:center;transform:rotate(-90deg)"/>
+          </svg>
+          <div class="donut-inner">
+            <div class="donut-num" id="donut-pct">0%</div>
+            <div style="font-size:.65rem;color:var(--text2)">aprovação</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Orçamentos por Mês</span>
+        <span class="card-badge">
+          <span style="color:var(--green)">■</span> Emitidos &nbsp;
+          <span style="color:var(--teal)">■</span> Aprovados
+        </span>
+      </div>
+      <div class="bars-wrap" id="bars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">Últimos Orçamentos</span>
+        <span class="card-badge">Recentes</span>
+      </div>
+      <div class="recents" id="recents"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80",
+  measurementId: "G-YG55PF92J6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let cur = '6m';
+let allOrcamentos = [];
+const fmt = v => 'R$ ' + v.toLocaleString('pt-BR');
+
+auth.onAuthStateChanged(u => {
+  if (!u) { window.location.href = 'login.html'; return; }
+  document.getElementById('user-email').textContent = u.email;
+  document.getElementById('avatar').textContent = u.email.slice(0,2).toUpperCase();
+  carregarDados(u.uid);
+});
+
+function showLoading() {
+  ['kpi-receita','kpi-total','kpi-taxa','kpi-ticket'].forEach(id => {
+    document.getElementById(id).textContent = '...';
+  });
+}
+
+async function carregarDados(uid) {
+  showLoading();
+  try {
+    const snap = await db.collection('usuarios').doc(uid).collection('orcamentos')
+      .orderBy('criadoEm', 'desc').get();
+
+    allOrcamentos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    if (allOrcamentos.length === 0) {
+      mostrarVazio();
+      return;
+    }
+
+    render('6m');
+  } catch (err) {
+    console.error(err);
+    mostrarVazio();
+  }
+}
+
+function mostrarVazio() {
+  ['kpi-receita','kpi-total','kpi-taxa','kpi-ticket'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+  document.getElementById('chart-wrap').innerHTML =
+    `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#2a4a33;font-size:.85rem">Nenhum orçamento salvo ainda</div>`;
+  document.getElementById('recents').innerHTML =
+    `<div style="color:#2a4a33;font-size:.85rem;padding:.5rem">Salve orçamentos no app para vê-los aqui</div>`;
+}
+
+function filtrarPorPeriodo(meses) {
+  const agora = new Date();
+  const inicio = new Date();
+  inicio.setMonth(agora.getMonth() - meses);
+  return allOrcamentos.filter(o => {
+    if (!o.criadoEm) return false;
+    const d = o.criadoEm.toDate ? o.criadoEm.toDate() : new Date(o.criadoEm);
+    return d >= inicio;
+  });
+}
+
+function processarDados(lista, numMeses) {
+  const agora = new Date();
+  const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const buckets = {};
+
+  for (let i = numMeses - 1; i >= 0; i--) {
+    const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    buckets[key] = { mes: mesesNomes[d.getMonth()], receita: 0, emitidos: 0, aprovados: 0 };
+  }
+
+  lista.forEach(o => {
+    const d = o.criadoEm?.toDate ? o.criadoEm.toDate() : new Date();
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    if (buckets[key]) {
+      buckets[key].emitidos++;
+      if (o.status === 'aprovado') {
+        buckets[key].aprovados++;
+        buckets[key].receita += o.valor || 0;
+      }
+    }
+  });
+
+  const vals = Object.values(buckets);
+  return {
+    meses:    vals.map(v => v.mes),
+    receita:  vals.map(v => v.receita),
+    emitidos: vals.map(v => v.emitidos),
+    aprovados:vals.map(v => v.aprovados),
+    recentes: lista.slice(0, 6).map(o => {
+      const d = o.criadoEm?.toDate ? o.criadoEm.toDate() : new Date();
+      return {
+        nome:    o.cliente || '—',
+        servico: o.servico || '—',
+        valor:   o.valor   || 0,
+        status:  o.status  || 'pendente',
+        data:    d.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit'}),
+        id:      o.id
+      };
+    })
+  };
+}
+
+function setPeriod(p, el) {
+  cur = p;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const labels = {'3m':'Últimos 3 meses','6m':'Últimos 6 meses','12m':'Últimos 12 meses'};
+  document.getElementById('chart-badge').textContent = labels[p];
+  render(p);
+}
+
+function animCount(id, to, fmtFn) {
+  const el = document.getElementById(id);
+  const steps = 40, dur = 900;
+  let i = 0;
+  clearInterval(el._t);
+  el._t = setInterval(() => {
+    i++;
+    el.textContent = fmtFn(Math.round(to * i/steps));
+    if (i >= steps) clearInterval(el._t);
+  }, dur/steps);
+}
+
+function render(p) {
+  const numMeses = p === '3m' ? 3 : p === '6m' ? 6 : 12;
+  const lista = filtrarPorPeriodo(numMeses);
+  const d = processarDados(lista, numMeses);
+
+  const totalR = d.receita.reduce((a,b)=>a+b,0);
+  const totalE = d.emitidos.reduce((a,b)=>a+b,0);
+  const totalA = d.aprovados.reduce((a,b)=>a+b,0);
+  const taxa   = totalE > 0 ? Math.round(totalA/totalE*100) : 0;
+  const ticket = totalA > 0 ? Math.round(totalR/totalA) : 0;
+
+  animCount('kpi-receita', totalR, fmt);
+  animCount('kpi-total',   totalE, v => v);
+  animCount('kpi-taxa',    taxa,   v => v+'%');
+  animCount('kpi-ticket',  ticket, fmt);
+
+  drawLine(d);
+  drawDonut(totalA, totalE - totalA);
+  drawBars(d);
+  drawRecents(d.recentes);
+}
+
+// Status update
+async function atualizarStatus(id, novoStatus) {
+  const u = auth.currentUser;
+  if (!u) return;
+  await db.collection('usuarios').doc(u.uid).collection('orcamentos').doc(id).update({ status: novoStatus });
+  // Reload
+  const idx = allOrcamentos.findIndex(o => o.id === id);
+  if (idx !== -1) allOrcamentos[idx].status = novoStatus;
+  render(cur);
+}
+
+function drawLine(d) {
+  const wrap = document.getElementById('chart-wrap');
+  const W = wrap.clientWidth || 520, H = 220;
+  const pad = {t:20,r:20,b:30,l:52};
+  const cW = W-pad.l-pad.r, cH = H-pad.t-pad.b;
+  const max = Math.max(...d.receita)*1.15;
+  const n = d.receita.length;
+  const px = i => pad.l + (i/(n-1))*cW;
+  const py = v => pad.t + (1-v/max)*cH;
+
+  const grid = [0,.25,.5,.75,1].map(f => {
+    const y = pad.t+f*cH, val = Math.round(max*(1-f));
+    return `<line x1="${pad.l}" y1="${y}" x2="${pad.l+cW}" y2="${y}" stroke="rgba(255,255,255,.04)"/>
+            <text x="${pad.l-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#5e8c6e" font-family="Epilogue">${val>=1000?Math.round(val/1000)+'k':val}</text>`;
+  }).join('');
+
+  const xL = d.meses.map((m,i) =>
+    `<text x="${px(i)}" y="${H-5}" text-anchor="middle" font-size="10" fill="#5e8c6e" font-family="Epilogue">${m}</text>`
+  ).join('');
+
+  const pts = d.receita.map((v,i)=>`${px(i)},${py(v)}`).join(' ');
+  const area = `M${px(0)},${py(d.receita[0])} `+d.receita.map((v,i)=>`L${px(i)},${py(v)}`).join(' ')+` L${px(n-1)},${pad.t+cH} L${px(0)},${pad.t+cH} Z`;
+
+  const dots = d.receita.map((v,i) =>
+    `<circle cx="${px(i)}" cy="${py(v)}" r="5" fill="#1ee07f" stroke="#0c1912" stroke-width="2.5"
+      style="cursor:pointer;transition:r .15s"
+      onmouseenter="showTip(event,${px(i)},${py(v)},'${d.meses[i]}',${v})"
+      onmouseleave="hideTip()"/>`
+  ).join('');
+
+  wrap.innerHTML = `
+    <div class="tooltip" id="tooltip"></div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1ee07f" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="#1ee07f" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${grid}${xL}
+      <path d="${area}" fill="url(#areaGrad)"/>
+      <polyline points="${pts}" fill="none" stroke="#1ee07f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+    </svg>`;
+}
+
+function showTip(e,cx,cy,mes,val) {
+  const tip = document.getElementById('tooltip');
+  if (!tip) return;
+  tip.innerHTML = `<strong>${fmt(val)}</strong> — ${mes}`;
+  tip.style.opacity = '1';
+  const r = document.getElementById('chart-wrap').getBoundingClientRect();
+  tip.style.left = (e.clientX-r.left-tip.offsetWidth/2)+'px';
+  tip.style.top = (e.clientY-r.top-46)+'px';
+}
+function hideTip() {
+  const t = document.getElementById('tooltip');
+  if (t) t.style.opacity='0';
+}
+
+function drawDonut(aprov, outros) {
+  const total = aprov+outros;
+  const pct = Math.round(aprov/total*100);
+  const circ = 2*Math.PI*58;
+  document.getElementById('donut-arc').style.strokeDashoffset = circ*(1-aprov/total);
+  document.getElementById('donut-pct').textContent = pct+'%';
+  document.getElementById('donut-legend').innerHTML = `
+    <div class="legend-row"><div class="legend-l"><div class="legend-dot" style="background:#1ee07f"></div>Aprovados</div><div class="legend-val" style="color:#1ee07f">${aprov}</div></div>
+    <div class="legend-row"><div class="legend-l"><div class="legend-dot" style="background:#e8c55a"></div>Pendentes</div><div class="legend-val" style="color:#e8c55a">${Math.round(outros*.5)}</div></div>
+    <div class="legend-row"><div class="legend-l"><div class="legend-dot" style="background:#f2645a"></div>Recusados</div><div class="legend-val" style="color:#f2645a">${Math.round(outros*.5)}</div></div>`;
+}
+
+function drawBars(d) {
+  const maxE = Math.max(...d.emitidos);
+  document.getElementById('bars').innerHTML = d.meses.map((m,i) => `
+    <div class="bar-col">
+      <div class="bar-track" style="height:50px"><div class="bar-fill" style="height:0" data-h="${Math.round(d.emitidos[i]/maxE*100)}%"></div></div>
+      <div class="bar-track" style="height:50px;margin-top:3px"><div class="bar-fill teal" style="height:0" data-h="${Math.round(d.aprovados[i]/maxE*100)}%"></div></div>
+      <div class="bar-label">${m}</div>
+    </div>`).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(b => b.style.height = b.dataset.h);
+  }, 80);
+}
+
+function drawRecents(list) {
+  if (!list.length) {
+    document.getElementById('recents').innerHTML =
+      `<div style="color:#2a4a33;font-size:.85rem;padding:.5rem">Nenhum orçamento neste período</div>`;
+    return;
+  }
+  const sm = {aprovado:{cls:'',l:'Aprovado'},pendente:{cls:'pend',l:'Pendente'},recusado:{cls:'rec',l:'Recusado'}};
+  document.getElementById('recents').innerHTML = list.map(r => {
+    const s = sm[r.status] || sm.pendente;
+    return `<div class="recent-item">
+      <div class="recent-l">
+        <div class="recent-name">${r.nome}</div>
+        <div class="recent-date">${r.servico} · ${r.data}</div>
+      </div>
+      <div class="recent-r">
+        <div class="recent-val">${fmt(r.valor)}</div>
+        <select onchange="atualizarStatus('${r.id}',this.value)"
+          style="background:var(--s2);border:1px solid var(--border2);color:var(--text2);font-size:.68rem;padding:.15rem .4rem;border-radius:6px;cursor:pointer;font-family:'Epilogue',sans-serif;outline:none;">
+          <option value="pendente" ${r.status==='pendente'?'selected':''}>Pendente</option>
+          <option value="aprovado" ${r.status==='aprovado'?'selected':''}>Aprovado</option>
+          <option value="recusado" ${r.status==='recusado'?'selected':''}>Recusado</option>
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.addEventListener('load', () => render('6m'));
+window.addEventListener('resize', () => drawLine(DADOS[cur]));
+</script>
+</body>
+</html>

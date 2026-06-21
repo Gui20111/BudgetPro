@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Planos</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #07100c;
+  --s1:      #0c1912;
+  --s2:      #111f17;
+  --green:   #1ee07f;
+  --green-d: #12a659;
+  --gold:    #f0c14b;
+  --text:    #e0f0e6;
+  --text2:   #5e8c6e;
+  --text3:   #2a4a33;
+  --border:  rgba(30,224,127,0.1);
+  --border2: rgba(255,255,255,0.05);
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+.orb { position:fixed;border-radius:50%;filter:blur(150px);pointer-events:none;z-index:0; }
+.orb1 { width:700px;height:700px;background:radial-gradient(circle,rgba(30,224,127,.08) 0%,transparent 65%);top:-250px;left:-200px;animation:o1 16s ease-in-out infinite; }
+.orb2 { width:500px;height:500px;background:radial-gradient(circle,rgba(240,193,75,.05) 0%,transparent 65%);bottom:-100px;right:-100px;animation:o2 20s ease-in-out infinite; }
+@keyframes o1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,60px)}}
+@keyframes o2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-50px)}}
+
+.page { position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 2rem 5rem; }
+
+/* HEADER */
+header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.6rem 2rem;border-bottom:1px solid var(--border2);
+  background:rgba(7,16,12,.8);backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:50;
+  animation:fd .5s ease both;
+}
+.logo { display:flex;align-items:center;gap:.6rem;text-decoration:none; }
+.logo-mark { width:32px;height:32px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(30,224,127,.3); }
+.logo-mark svg { width:16px;height:16px; }
+.logo-name { font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text); }
+.logo-name span { color:var(--green); }
+.back-btn { display:flex;align-items:center;gap:.4rem;background:var(--s2);border:1px solid var(--border2);color:var(--text2);font-family:'Cabinet Grotesk',sans-serif;font-size:.8rem;padding:.4rem .9rem;border-radius:8px;cursor:pointer;transition:.2s;text-decoration:none; }
+.back-btn:hover { border-color:var(--green);color:var(--green); }
+
+/* HERO */
+.hero {
+  text-align:center;padding:5rem 0 4rem;
+  animation:fu .6s .1s ease both;animation-fill-mode:both;
+}
+.hero-badge {
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(30,224,127,.07);border:1px solid var(--border);
+  color:var(--green);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:.35rem 1rem;border-radius:50px;margin-bottom:1.5rem;
+}
+.hero h1 {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(2.5rem,5vw,4rem);
+  line-height:1.05;letter-spacing:-.02em;
+  color:var(--text);margin-bottom:1rem;
+}
+.hero h1 em { font-style:italic;color:var(--green); }
+.hero p { font-size:1rem;color:var(--text2);font-weight:300;max-width:480px;margin:0 auto;line-height:1.7; }
+
+/* TOGGLE */
+.toggle-wrap {
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  margin:2.5rem 0;animation:fu .6s .2s ease both;animation-fill-mode:both;
+}
+.toggle-label { font-size:.88rem;color:var(--text2);font-weight:500; }
+.toggle-label.active { color:var(--text); }
+.toggle {
+  width:48px;height:26px;background:var(--s2);border:1px solid var(--border2);
+  border-radius:50px;position:relative;cursor:pointer;transition:.3s;
+}
+.toggle.on { background:var(--green); }
+.toggle-thumb {
+  width:20px;height:20px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;transition:.3s;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.toggle.on .toggle-thumb { left:24px; }
+.save-badge {
+  background:rgba(240,193,75,.1);border:1px solid rgba(240,193,75,.2);
+  color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:.06em;
+  padding:.2rem .55rem;border-radius:50px;
+}
+
+/* CARDS */
+.plans {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;
+  animation:fu .6s .3s ease both;animation-fill-mode:both;
+}
+
+.plan {
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:20px;padding:2rem;position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s,box-shadow .3s;display:flex;flex-direction:column;
+}
+
+.plan:hover {
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+
+.plan.featured {
+  border-color:var(--green);
+  box-shadow:0 0 0 1px var(--green),0 20px 60px rgba(30,224,127,.1);
+}
+
+.plan.featured::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--green),#a8ffcf,var(--green));
+  background-size:200%;animation:shimmer 3s linear infinite;
+}
+
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+
+.plan-badge {
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:.2rem .6rem;border-radius:50px;margin-bottom:1.25rem;width:fit-content;
+}
+
+.plan-name {
+  font-family:'Instrument Serif',serif;font-size:1.6rem;font-weight:400;
+  letter-spacing:-.01em;margin-bottom:.35rem;
+}
+
+.plan-desc { font-size:.83rem;color:var(--text2);font-weight:300;line-height:1.6;margin-bottom:1.75rem; }
+
+.price-wrap { margin-bottom:1.75rem; }
+
+.price {
+  font-family:'Cabinet Grotesk',sans-serif;font-size:3rem;font-weight:800;
+  letter-spacing:-.04em;line-height:1;
+}
+
+.price sup { font-size:1.2rem;font-weight:700;vertical-align:super;margin-right:.1rem; }
+.price sub { font-size:.9rem;font-weight:400;color:var(--text2);vertical-align:baseline;margin-left:.15rem; }
+.price-anual { font-size:.75rem;color:var(--text2);margin-top:.4rem;font-weight:300; }
+
+.plan-btn {
+  width:100%;padding:.9rem;border-radius:11px;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:pointer;border:none;transition:.2s;margin-bottom:1.75rem;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+
+.plan-btn:hover { transform:translateY(-1px); }
+.plan-btn:active { transform:scale(.98); }
+
+.divider { height:1px;background:var(--border2);margin-bottom:1.5rem; }
+
+.features { display:flex;flex-direction:column;gap:.75rem;flex:1; }
+
+.feat-row { display:flex;align-items:flex-start;gap:.65rem;font-size:.84rem; }
+
+.feat-icon { width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.05rem; }
+
+.feat-icon svg { width:10px;height:10px; }
+
+.feat-text { color:var(--text2);line-height:1.4; }
+.feat-text strong { color:var(--text);font-weight:600; }
+
+/* GRATUITO */
+.plan-free .plan-badge { background:rgba(255,255,255,.06);color:var(--text2); }
+.plan-free .plan-name { color:var(--text); }
+.plan-free .price { color:var(--text); }
+.plan-free .plan-btn { background:var(--s2);color:var(--text);border:1px solid var(--border2); }
+.plan-free .plan-btn:hover { border-color:var(--text3);background:var(--s2); }
+.plan-free .feat-icon { background:rgba(255,255,255,.06); }
+.plan-free .feat-icon svg { stroke:var(--text2); }
+
+/* PRO */
+.plan-pro .plan-badge { background:rgba(30,224,127,.1);color:var(--green);border:1px solid rgba(30,224,127,.2); }
+.plan-pro .plan-name { color:var(--text); }
+.plan-pro .price { color:var(--green); }
+.plan-pro .plan-btn { background:var(--green);color:#07100c;box-shadow:0 4px 20px rgba(30,224,127,.25); }
+.plan-pro .plan-btn:hover { background:#25f090;box-shadow:0 6px 28px rgba(30,224,127,.35); }
+.plan-pro .feat-icon { background:rgba(30,224,127,.1); }
+.plan-pro .feat-icon svg { stroke:var(--green); }
+
+/* BUSINESS */
+.plan-biz .plan-badge { background:rgba(240,193,75,.08);color:var(--gold);border:1px solid rgba(240,193,75,.2); }
+.plan-biz .plan-name { color:var(--text); }
+.plan-biz .price { color:var(--gold); }
+.plan-biz .plan-btn { background:var(--gold);color:#07100c;box-shadow:0 4px 20px rgba(240,193,75,.2); }
+.plan-biz .plan-btn:hover { background:#f5cc5e;box-shadow:0 6px 28px rgba(240,193,75,.3); }
+.plan-biz .feat-icon { background:rgba(240,193,75,.08); }
+.plan-biz .feat-icon svg { stroke:var(--gold); }
+
+/* FAQ */
+.faq-section { margin-top:5rem;animation:fu .6s .5s ease both;animation-fill-mode:both; }
+.faq-title { font-family:'Instrument Serif',serif;font-size:2rem;text-align:center;margin-bottom:2.5rem; }
+.faqs { display:grid;grid-template-columns:1fr 1fr;gap:.75rem;max-width:800px;margin:0 auto; }
+.faq { background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:1.25rem 1.5rem;cursor:pointer;transition:.2s; }
+.faq:hover { border-color:var(--text3); }
+.faq-q { font-size:.88rem;font-weight:700;margin-bottom:.5rem;color:var(--text); }
+.faq-a { font-size:.82rem;color:var(--text2);line-height:1.6;font-weight:300; }
+
+/* TOAST */
+.toast { position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s1);border:1px solid var(--border);color:var(--text);padding:.75rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;z-index:999;white-space:nowrap;border-left:3px solid var(--green); }
+.toast.show { transform:translateX(-50%) translateY(0);opacity:1; }
+.toast.error { border-left-color:#f2645a; }
+
+/* MODAL */
+.modal-bg { position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem; }
+.modal-bg.open { display:flex; }
+.modal { background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:2.5rem;max-width:420px;width:100%;animation:modalIn .3s ease both; }
+@keyframes modalIn { from{opacity:0;transform:scale(.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal h3 { font-family:'Instrument Serif',serif;font-size:1.6rem;margin-bottom:.5rem; }
+.modal p { font-size:.85rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6; }
+.modal-plan-info { background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center; }
+.modal-plan-name { font-size:.85rem;color:var(--text2); }
+.modal-plan-price { font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1.1rem;color:var(--green); }
+.modal-btn { width:100%;padding:.9rem;background:var(--green);color:#07100c;border:none;border-radius:11px;font-family:'Cabinet Grotesk',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;margin-bottom:.75rem; }
+.modal-btn:hover { background:#25f090; }
+.modal-btn.gold { background:var(--gold);color:#07100c; }
+.modal-btn.gold:hover { background:#f5cc5e; }
+.modal-cancel { width:100%;padding:.75rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:11px;font-family:'Cabinet Grotesk',sans-serif;font-size:.85rem;cursor:pointer;transition:.2s; }
+.modal-cancel:hover { border-color:var(--text3);color:var(--text); }
+
+@keyframes fu { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fd { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+
+@media(max-width:800px) {
+  .plans { grid-template-columns:1fr; max-width:420px;margin:0 auto; }
+  .faqs { grid-template-columns:1fr; }
+  .hero { padding:3rem 0 2.5rem; }
+  .page { padding:0 1.25rem 4rem; }
+}
+@media(max-width:480px) {
+  header { padding:1.1rem 1.25rem; }
+  .hero h1 { font-size:2.2rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<header>
+  <a class="logo" href="hub.html">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#07100c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">Budget<span>Pro</span></span>
+  </a>
+  <a class="back-btn" href="hub.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Voltar ao painel
+  </a>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">💳 Planos & Preços</div>
+    <h1>Simples, transparente<br>e <em>sem surpresas.</em></h1>
+    <p>Comece grátis e faça upgrade quando precisar. Cancele quando quiser.</p>
+  </div>
+
+  <!-- TOGGLE MENSAL/ANUAL -->
+  <div class="toggle-wrap">
+    <span class="toggle-label active" id="label-mensal">Mensal</span>
+    <div class="toggle" id="toggle" onclick="togglePeriod()">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span class="toggle-label" id="label-anual">Anual</span>
+    <span class="save-badge">Economize 20%</span>
+  </div>
+
+  <!-- PLANOS -->
+  <div class="plans">
+
+    <!-- GRATUITO -->
+    <div class="plan plan-free">
+      <div class="plan-badge">Gratuito</div>
+      <div class="plan-name">Starter</div>
+      <div class="plan-desc">Para quem está começando e quer testar o BudgetPro.</div>
+      <div class="price-wrap">
+        <div class="price">R$<span>0</span></div>
+        <div class="price-anual">Para sempre gratuito</div>
+      </div>
+      <button class="plan-btn" onclick="irApp()">
+        Usar grátis
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div class="divider"></div>
+      <div class="features">
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text"><strong>5 orçamentos</strong> por mês</div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Download em <strong>PDF</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Copiar para <strong>WhatsApp</strong></div>
+        </div>
+        <div class="feat-row" style="opacity:.35">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div class="feat-text">Dashboard de métricas</div>
+        </div>
+        <div class="feat-row" style="opacity:.35">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div class="feat-text">Logo no PDF</div>
+        </div>
+        <div class="feat-row" style="opacity:.35">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div class="feat-text">Suporte prioritário</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan plan-pro featured">
+      <div class="plan-badge">⚡ Mais popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-desc">Para freelancers e autônomos que levam o negócio a sério.</div>
+      <div class="price-wrap">
+        <div class="price" id="price-pro"><sup>R$</sup><span id="val-pro">29</span><sub id="period-pro">/mês</sub></div>
+        <div class="price-anual" id="anual-pro" style="display:none">R$ 278/ano — 2 meses grátis</div>
+      </div>
+      <button class="plan-btn" onclick="abrirModal('pro')">
+        Assinar Pro
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div class="divider"></div>
+      <div class="features">
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text"><strong>Orçamentos ilimitados</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Download em <strong>PDF</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text"><strong>Dashboard</strong> completo</div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text"><strong>Logo</strong> da empresa no PDF</div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Suporte por <strong>email</strong></div>
+        </div>
+        <div class="feat-row" style="opacity:.35">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div class="feat-text">Múltiplos usuários</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="plan plan-biz">
+      <div class="plan-badge">🏢 Business</div>
+      <div class="plan-name">Business</div>
+      <div class="plan-desc">Para agências e empresas que precisam de mais poder.</div>
+      <div class="price-wrap">
+        <div class="price"><sup>R$</sup><span id="val-biz">79</span><sub id="period-biz">/mês</sub></div>
+        <div class="price-anual" id="anual-biz" style="display:none">R$ 758/ano — 2 meses grátis</div>
+      </div>
+      <button class="plan-btn gold" onclick="abrirModal('biz')">
+        Assinar Business
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div class="divider"></div>
+      <div class="features">
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text"><strong>Tudo do Pro</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Até <strong>5 usuários</strong> na conta</div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Relatórios <strong>avançados</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Suporte <strong>prioritário</strong></div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Personalização <strong>avançada</strong> de PDF</div>
+        </div>
+        <div class="feat-row">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="feat-text">Acesso à <strong>API</strong></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-title">Dúvidas frequentes</div>
+    <div class="faqs">
+      <div class="faq">
+        <div class="faq-q">Posso cancelar quando quiser?</div>
+        <div class="faq-a">Sim. Sem multa, sem burocracia. Cancele pelo painel a qualquer momento e você continua com acesso até o fim do período pago.</div>
+      </div>
+      <div class="faq">
+        <div class="faq-q">O plano gratuito expira?</div>
+        <div class="faq-a">Não. O Starter é gratuito para sempre — você só faz upgrade quando quiser mais recursos ou mais orçamentos por mês.</div>
+      </div>
+      <div class="faq">
+        <div class="faq-q">Quais formas de pagamento aceitam?</div>
+        <div class="faq-a">Cartão de crédito, débito e Pix. O pagamento é processado com segurança pelo Stripe.</div>
+      </div>
+      <div class="faq">
+        <div class="faq-q">O que acontece se eu ultrapassar o limite?</div>
+        <div class="faq-a">Você recebe uma notificação e pode fazer upgrade na hora. Seus orçamentos existentes ficam salvos normalmente.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Assinar Pro</h3>
+    <p id="modal-desc">Você será redirecionado para o checkout seguro do Stripe. O pagamento é processado com criptografia de ponta a ponta.</p>
+    <div class="modal-plan-info">
+      <span class="modal-plan-name" id="modal-plan-name">BudgetPro Pro</span>
+      <span class="modal-plan-price" id="modal-plan-price">R$ 29/mês</span>
+    </div>
+    <button class="modal-btn" id="modal-btn" onclick="irCheckout()">
+      Continuar para pagamento →
+    </button>
+    <button class="modal-cancel" onclick="fecharModal()">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+const stripe = Stripe('pk_test_51TT0LLR0wkFLWGjFqiqpkXeCAELZSpNJkWTBQQdOSR851kgbCclPgUTHp8j28NbqzTXJ4hZzHzxLOFyxbTyftPeA00RGCnSClJ');
+
+const PRICES = {
+  pro:  { mensal: 'price_1TT0UMR0wkFLWGjFs7XYe3Z4', anual: 'price_1TT0UMR0wkFLWGjFs7XYe3Z4' },
+  biz:  { mensal: 'price_1TT0WMR0wkFLWGjFiu0EKOAv', anual: 'price_1TT0WMR0wkFLWGjFiu0EKOAv' }
+};
+
+let isAnual = false;
+let selectedPlan = 'pro';
+
+function togglePeriod() {
+  isAnual = !isAnual;
+  const toggle = document.getElementById('toggle');
+  toggle.classList.toggle('on', isAnual);
+  document.getElementById('label-mensal').classList.toggle('active', !isAnual);
+  document.getElementById('label-anual').classList.toggle('active', isAnual);
+
+  document.getElementById('val-pro').textContent = isAnual ? '23' : '29';
+  document.getElementById('period-pro').textContent = isAnual ? '/mês' : '/mês';
+  document.getElementById('anual-pro').style.display = isAnual ? 'block' : 'none';
+
+  document.getElementById('val-biz').textContent = isAnual ? '63' : '79';
+  document.getElementById('period-biz').textContent = isAnual ? '/mês' : '/mês';
+  document.getElementById('anual-biz').style.display = isAnual ? 'block' : 'none';
+}
+
+function abrirModal(plano) {
+  selectedPlan = plano;
+  const isPro = plano === 'pro';
+  const price = isPro ? (isAnual ? 'R$ 23/mês' : 'R$ 29/mês') : (isAnual ? 'R$ 63/mês' : 'R$ 79/mês');
+
+  document.getElementById('modal-title').textContent = isPro ? 'Assinar Pro' : 'Assinar Business';
+  document.getElementById('modal-plan-name').textContent = isPro ? 'BudgetPro Pro' : 'BudgetPro Business';
+  document.getElementById('modal-plan-price').textContent = price;
+  document.getElementById('modal-plan-price').style.color = isPro ? 'var(--green)' : 'var(--gold)';
+
+  const btn = document.getElementById('modal-btn');
+  btn.className = 'modal-btn' + (isPro ? '' : ' gold');
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function fecharModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+async function irCheckout() {
+  const user = auth.currentUser;
+  if (!user) {
+    showToast('Faça login primeiro', 'error');
+    setTimeout(() => window.location.href = 'login.html', 1500);
+    return;
+  }
+
+  const btn = document.getElementById('modal-btn');
+  btn.textContent = 'Redirecionando...';
+  btn.disabled = true;
+
+  try {
+    const period = isAnual ? 'anual' : 'mensal';
+    const priceId = PRICES[selectedPlan][period];
+    const userEmail = user.email;
+    const userId = user.uid;
+
+    // Chama a Vercel Serverless Function
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId, userEmail, userId })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Erro ao criar sessão');
+    }
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'error');
+    btn.textContent = 'Continuar para pagamento →';
+    btn.disabled = false;
+  }
+}
+
+function irApp() {
+  const user = auth.currentUser;
+  if (user) window.location.href = 'hub.html';
+  else window.location.href = 'login.html';
+}
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Fechar modal clicando fora
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) fecharModal();
+});
+</script>
+</body>
+</html>

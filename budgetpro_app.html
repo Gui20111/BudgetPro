@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetPro — Gerador de Orçamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #080f0c;
+  --surface:   #0e1a14;
+  --surface2:  #132019;
+  --border:    rgba(45, 210, 130, 0.12);
+  --border2:   rgba(255,255,255,0.06);
+  --green:     #1fcc7a;
+  --green-dim: #17a060;
+  --green-glow:rgba(31, 204, 122, 0.15);
+  --text:      #e8f2ec;
+  --text-2:    #7a9e8a;
+  --text-3:    #3f5c4a;
+  --danger:    #f05a5a;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(130px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(31,204,122,0.12) 0%, transparent 65%);
+  top: -200px; left: -150px;
+  animation: drift1 12s ease-in-out infinite;
+}
+.orb-2 {
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(31,204,122,0.08) 0%, transparent 65%);
+  bottom: -100px; right: -100px;
+  animation: drift2 15s ease-in-out infinite;
+}
+@keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,50px)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,-40px)} }
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 2.5rem;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 2.5rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.6rem; }
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: var(--green);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.logo-mark svg { width: 18px; height: 18px; }
+
+.logo-text {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.logo-text span { color: var(--green); }
+
+.header-badge {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.35rem 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.page-title {
+  margin-bottom: 2rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.page-title h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.page-title p { font-size: 0.9rem; color: var(--text-2); font-weight: 300; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.75rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.card:nth-child(2) { animation-delay: 0.1s; }
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.03em;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-glow);
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-3); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.btn-gen {
+  width: 100%;
+  padding: 0.9rem;
+  margin-top: 0.5rem;
+  background: var(--green);
+  color: #080f0c;
+  border: none;
+  border-radius: 10px;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-gen:hover { background: #25e589; box-shadow: 0 4px 24px rgba(31,204,122,0.3); }
+.btn-gen:active { transform: scale(0.98); }
+
+.preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  color: var(--text-3);
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.preview-empty svg { opacity: 0.3; }
+.preview-empty p { font-size: 0.85rem; font-weight: 300; line-height: 1.6; }
+
+.orcamento { display: none; }
+.orcamento.show { display: block; animation: fadeUp 0.4s ease both; }
+
+.orc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border2);
+}
+
+.orc-top-left h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 0.3rem;
+}
+
+.orc-empresa-name {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.orc-number { font-size: 0.75rem; color: var(--text-3); text-align: right; }
+.orc-number strong {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.orc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border2);
+  gap: 1rem;
+}
+
+.orc-row:last-of-type { border-bottom: none; }
+
+.orc-row-label { font-size: 0.78rem; color: var(--text-2); font-weight: 400; flex-shrink: 0; }
+.orc-row-val { font-size: 0.88rem; color: var(--text); text-align: right; word-break: break-word; max-width: 60%; }
+
+.orc-total {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(31,204,122,0.07);
+  border: 1px solid rgba(31,204,122,0.2);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orc-total-label {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 500;
+}
+
+.orc-total-value {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: -0.02em;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.btn-act {
+  padding: 0.75rem;
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  background: var(--surface2);
+  color: var(--text-2);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-act:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+.btn-act:active { transform: scale(0.97); }
+
+.toast {
+  position: fixed;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0;
+  z-index: 999;
+  white-space: nowrap;
+  border-left: 3px solid var(--green);
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.error { border-left-color: var(--danger); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .page { padding: 0 1rem 3rem; }
+  header { padding: 1.25rem 0; flex-wrap: wrap; gap: .5rem; }
+  .header-badge { font-size: 0.65rem; padding: .25rem .65rem; }
+  .page-title h1 { font-size: 1.5rem; }
+  .row2 { grid-template-columns: 1fr; }
+  .actions { grid-template-columns: 1fr; }
+  .orc-total-value { font-size: 1.1rem; }
+  .preview-empty { min-height: 200px; }
+  .card { padding: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="page">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#080f0c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <span class="logo-text">Budget<span>Pro</span></span>
+    </div>
+    <span class="header-badge">Gerador de Orçamentos</span>
+  </header>
+
+  <div class="page-title">
+    <h1>Novo Orçamento</h1>
+    <p>Preencha os dados e visualize o orçamento em tempo real</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+      <div class="card-label">Dados do cliente</div>
+
+      <div class="field">
+        <label>Empresa</label>
+        <input id="empresa" type="text" placeholder="Nome da empresa">
+      </div>
+
+      <div class="field">
+        <label>Cliente</label>
+        <input id="cliente" type="text" placeholder="Nome do cliente">
+      </div>
+
+      <div class="field">
+        <label>Serviço</label>
+        <input id="servico" type="text" placeholder="Ex: Desenvolvimento de site">
+      </div>
+
+      <div class="field">
+        <label>Descrição</label>
+        <textarea id="desc" placeholder="Detalhe o escopo do serviço..."></textarea>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Valor (R$)</label>
+          <input id="valor" type="text" placeholder="0,00">
+        </div>
+        <div class="field">
+          <label>Prazo</label>
+          <input id="prazo" type="text" placeholder="Ex: 15 dias">
+        </div>
+      </div>
+
+      <button class="btn-gen" onclick="gerar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        Gerar Orçamento
+      </button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <div class="card-label">Prévia do orçamento</div>
+
+      <div class="preview-empty" id="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <p>Preencha os dados ao lado<br>e clique em Gerar Orçamento</p>
+      </div>
+
+      <div id="orc" class="orcamento">
+        <div class="orc-top">
+          <div class="orc-top-left">
+            <h3>Orçamento</h3>
+            <div class="orc-empresa-name" id="orc-empresa"></div>
+          </div>
+          <div class="orc-number">
+            <strong id="orc-data"></strong>
+            Emitido hoje
+          </div>
+        </div>
+
+        <div class="orc-row">
+          <span class="orc-row-label">Cliente</span>
+          <span class="orc-row-val" id="orc-cliente"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Serviço</span>
+          <span class="orc-row-val" id="orc-servico"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Descrição</span>
+          <span class="orc-row-val" id="orc-desc"></span>
+        </div>
+        <div class="orc-row">
+          <span class="orc-row-label">Prazo</span>
+          <span class="orc-row-val" id="orc-prazo"></span>
+        </div>
+
+        <div class="orc-total">
+          <span class="orc-total-label">Valor Total</span>
+          <span class="orc-total-value" id="orc-valor"></span>
+        </div>
+
+        <div class="actions">
+          <button class="btn-act" onclick="copiar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copiar texto
+          </button>
+          <button class="btn-act" onclick="gerarPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Baixar PDF
+          </button>
+        </div>
+
+        <!-- BOTÃO SALVAR -->
+        <button id="btn-salvar" onclick="salvarOrcamento()"
+          disabled
+          style="
+            width:100%;margin-top:.75rem;padding:.85rem;
+            background:var(--green);color:#080f0c;
+            border:none;border-radius:10px;
+            font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;
+            cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;
+            transition:background .2s,box-shadow .2s,transform .1s;
+            opacity:.35;pointer-events:none;
+          ">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Salvar Orçamento
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBDSRNVuQSzyqI7-YZcqBj84PCXGlX6C8s",
+  authDomain: "budgetpro-1cbc0.firebaseapp.com",
+  projectId: "budgetpro-1cbc0",
+  storageBucket: "budgetpro-1cbc0.firebasestorage.app",
+  messagingSenderId: "73704247425",
+  appId: "1:73704247425:web:e9b9fac2ff58709a61bd80",
+  measurementId: "G-YG55PF92J6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+auth.onAuthStateChanged(user => {
+  if (!user) window.location.href = 'login.html';
+});
+
+async function gerar() {
+  const user = auth.currentUser;
+  if (!user) { showToast('Faça login primeiro', 'error'); return; }
+
+  // Busca dados do usuário
+  const userDoc = await db.collection('usuarios').doc(user.uid).get();
+  const dados = userDoc.data() || {};
+  const plano = dados.plano || 'gratuito';
+  const mesAtual = new Date().getMonth();
+
+  // Reseta contador se mudou o mês
+  let orcamentosNoMes = dados.orcamentosNoMes || 0;
+  if (dados.mesAtual !== mesAtual) {
+    orcamentosNoMes = 0;
+  await db.collection('usuarios').doc(user.uid).set({
+  orcamentosNoMes: 0,
+  mesAtual: mesAtual
+}, { merge: true });
+ }
+
+  // Bloqueia se for gratuito e já usou 5
+  if (plano === 'gratuito' && orcamentosNoMes >= 5) {
+    mostrarModalUpgrade();
+    return;
+  }
+
+  // Incrementa contador
+await db.collection('usuarios').doc(user.uid).set({
+  orcamentosNoMes: orcamentosNoMes + 1
+}, { merge: true });
+
+  // Gera o orçamento normalmente
+  const empresa = document.getElementById('empresa').value;
+  const cliente = document.getElementById('cliente').value;
+  const servico = document.getElementById('servico').value;
+  const desc    = document.getElementById('desc').value;
+  const prazo   = document.getElementById('prazo').value;
+  const valor   = document.getElementById('valor').value;
+
+  if (!empresa && !cliente && !servico) {
+    showToast('Preencha ao menos empresa, cliente e serviço', 'error');
+    return;
+  }
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('orc').classList.add('show');
+
+  document.getElementById('orc-empresa').innerText = empresa || '—';
+  document.getElementById('orc-cliente').innerText = cliente || '—';
+  document.getElementById('orc-servico').innerText = servico || '—';
+  document.getElementById('orc-desc').innerText    = desc    || '—';
+  document.getElementById('orc-prazo').innerText   = prazo   || '—';
+  document.getElementById('orc-valor').innerText   = valor ? 'R$ ' + valor : '—';
+  document.getElementById('orc-data').innerText    = new Date().toLocaleDateString('pt-BR');
+
+  showToast('✓ Orçamento gerado!');
+  document.getElementById('btn-salvar').disabled = false;
+  document.getElementById('btn-salvar').style.opacity = '1';
+  document.getElementById('btn-salvar').style.pointerEvents = 'auto';
+}
+
+function mostrarModalUpgrade() {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+    z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;
+  `;
+  modal.innerHTML = `
+    <div style="background:#0c1912;border:1px solid rgba(30,224,127,.2);border-radius:20px;padding:2.5rem;max-width:400px;width:100%;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:1rem">🚀</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:.75rem;color:#dff0e6">Limite atingido!</h3>
+      <p style="font-size:.88rem;color:#5e8c6e;margin-bottom:1.5rem;line-height:1.6">
+        Você usou seus <strong style="color:#dff0e6">5 orçamentos gratuitos</strong> deste mês.<br>
+        Faça upgrade para continuar gerando sem limites!
+      </p>
+      <a href="pricing.html" style="display:block;width:100%;padding:.9rem;background:#1ee07f;color:#07100c;border-radius:11px;font-family:'Syne',sans-serif;font-weight:700;text-decoration:none;margin-bottom:.75rem;">
+        ⚡ Fazer upgrade agora
+      </a>
+      <button onclick="this.closest('div').parentElement.remove()" style="width:100%;padding:.75rem;background:transparent;color:#5e8c6e;border:1px solid rgba(255,255,255,.05);border-radius:11px;cursor:pointer;font-family:'Syne',sans-serif;">
+        Cancelar
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+async function salvarOrcamento() {
+  const user = auth.currentUser;
+  if (!user) { showToast('Faça login para salvar', 'error'); return; }
+
+  const btn = document.getElementById('btn-salvar');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Salvando...`;
+
+  const empresa = document.getElementById('orc-empresa').innerText;
+  const cliente = document.getElementById('orc-cliente').innerText;
+  const servico = document.getElementById('orc-servico').innerText;
+  const desc    = document.getElementById('orc-desc').innerText;
+  const prazo   = document.getElementById('orc-prazo').innerText;
+  const valorTxt = document.getElementById('orc-valor').innerText;
+  const valorNum = parseFloat(valorTxt.replace('R$','').replace(/\./g,'').replace(',','.').trim()) || 0;
+
+  try {
+    await db.collection('usuarios').doc(user.uid).collection('orcamentos').add({
+      empresa, cliente, servico, desc, prazo,
+      valor: valorNum,
+      status: 'pendente',
+      data: firebase.firestore.Timestamp.fromDate(new Date()),
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Salvo no Dashboard!`;
+    btn.style.background = 'var(--green-dim)';
+    btn.style.pointerEvents = 'none';
+    showToast('✓ Orçamento salvo no dashboard!');
+  } catch (err) {
+    showToast('Erro ao salvar: ' + err.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Orçamento`;
+  }
+}
+
+function copiar() {
+  const texto = `ORÇAMENTO\n\nEmpresa: ${document.getElementById('orc-empresa').innerText}\nCliente: ${document.getElementById('orc-cliente').innerText}\nServiço: ${document.getElementById('orc-servico').innerText}\nDescrição: ${document.getElementById('orc-desc').innerText}\nPrazo: ${document.getElementById('orc-prazo').innerText}\n\nValor total: ${document.getElementById('orc-valor').innerText}`;
+
+  navigator.clipboard.writeText(texto)
+    .then(() => showToast('✓ Texto copiado!'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('✓ Texto copiado!');
+    });
+}
+
+function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const empresa = document.getElementById('orc-empresa').innerText;
+  const cliente = document.getElementById('orc-cliente').innerText;
+  const servico = document.getElementById('orc-servico').innerText;
+  const desc    = document.getElementById('orc-desc').innerText;
+  const prazo   = document.getElementById('orc-prazo').innerText;
+  const valor   = document.getElementById('orc-valor').innerText;
+  const data    = document.getElementById('orc-data').innerText;
+
+  const W = 210;
+  const margin = 20;
+
+  // Fundo branco total
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, W, 297, 'F');
+
+  // ── HEADER: barra verde escura ──
+  doc.setFillColor(13, 43, 31);
+  doc.rect(0, 0, W, 44, 'F');
+
+  // Logo texto
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Budget', margin, 20);
+  const budgetW = doc.getTextWidth('Budget');
+  doc.setTextColor(31, 204, 122);
+  doc.text('Pro', margin + budgetW, 20);
+
+  // Subtítulo e data no header
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120, 180, 150);
+  doc.text('Orçamento Profissional', margin, 30);
+  doc.text('Data: ' + data, W - margin - doc.getTextWidth('Data: ' + data), 30);
+
+  // Número do orçamento
+  doc.setFontSize(8);
+  doc.setTextColor(80, 130, 100);
+  const num = 'Nº ' + String(Date.now()).slice(-6);
+  doc.text(num, W - margin - doc.getTextWidth(num), 38);
+
+  // ── SEÇÃO: Empresa ──
+  let y = 62;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.setTextColor(13, 43, 31);
+  doc.text(empresa, margin, y);
+
+  // Linha divisória verde
+  y += 6;
+  doc.setDrawColor(31, 204, 122);
+  doc.setLineWidth(0.8);
+  doc.line(margin, y, W - margin, y);
+
+  // ── TABELA DE DADOS ──
+  y += 12;
+  const rows = [
+    ['Cliente',    cliente],
+    ['Serviço',    servico],
+    ['Descrição',  desc],
+    ['Prazo',      prazo],
+  ];
+
+  rows.forEach(([label, val], i) => {
+    // Fundo alternado nas linhas
+    if (i % 2 === 0) {
+      doc.setFillColor(245, 250, 247);
+      doc.rect(margin, y - 5, W - margin * 2, 13, 'F');
+    }
+
+    // Label
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(80, 120, 95);
+    doc.text(label, margin + 3, y + 3);
+
+    // Valor com quebra de linha automática
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(20, 40, 30);
+    const maxW = W - margin - 75;
+    const lines = doc.splitTextToSize(val, maxW);
+    doc.text(lines, 75, y + 3);
+
+    const lineH = lines.length > 1 ? lines.length * 6 + 6 : 13;
+    y += lineH;
+
+    // Separador leve
+    doc.setDrawColor(220, 235, 225);
+    doc.setLineWidth(0.2);
+    doc.line(margin, y - 1, W - margin, y - 1);
+  });
+
+  // ── BOX TOTAL ──
+  y += 8;
+  doc.setFillColor(13, 43, 31);
+  doc.roundedRect(margin, y, W - margin * 2, 24, 4, 4, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(120, 180, 150);
+  doc.text('VALOR TOTAL', margin + 8, y + 15);
+
+  doc.setFontSize(16);
+  doc.setTextColor(31, 204, 122);
+  const valorW = doc.getTextWidth(valor);
+  doc.text(valor, W - margin - valorW - 8, y + 15);
+
+  // ── RODAPÉ ──
+  const footerY = 280;
+  doc.setDrawColor(220, 235, 225);
+  doc.setLineWidth(0.3);
+  doc.line(margin, footerY - 4, W - margin, footerY - 4);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(160, 190, 170);
+  doc.text('Gerado com BudgetPro', margin, footerY + 4);
+  doc.text(data, W - margin - doc.getTextWidth(data), footerY + 4);
+
+  doc.save('orcamento_' + empresa.replace(/\s+/g, '_').toLowerCase() + '.pdf');
+  showToast('✓ PDF baixado!');
+}
+</script>
+
+</body>
+</html>
